@@ -1,0 +1,5 @@
+module load singularity
+
+singularity pull docker://jho5ze/dmelsync:latest
+
+singularity run dmelsync_latest.sif <read_1> <read_2> <sample_name> <output_folder>

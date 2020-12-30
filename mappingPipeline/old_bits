@@ -1,0 +1,74 @@
+
+sbatch --array=2 \
+${wd}/DEST/mappingPipeline/scripts/runDocker.sh
+
+sacct -j 17108854
+
+
+
+
+
+### 5. Docker info
+singularity run \
+dmelsync_hpc.sif \
+<read_1> <read_2> \
+<sample_name> \
+<output_folder> \
+--cores <optional> \
+--max_cov <optional> \
+--min_cov <optional>
+--do_prep 0 \
+--do_snape 1 \
+--do_poolsnp 1
+
+#### Input
+* read_1 full path
+* read_2 full path
+* name of sample
+* full path of output directory
+* optional number of cores to use (try 6 or 20 depending on you system) (--cores/-c, default = 1)
+* optional specification of the maximum coverage for the masking step (--max_cov/-x, default = 0.95)
+* optional specification of the minimum coverage for the masking step (--min_cov/-n, default = 10)
+
+#### Output contained in the output directory under a folder named for the sample name
+* directory of fastq analysis for trimmed and untrimmed reads
+* intervals file used for GATK IndelRealigner
+* original bam file containing all reads (original.bam)
+* simulans contaminants bam file (sim.bam)
+* melanogaster reads (mel.bam)
+* genomewide SYNC file (genomewide.sync) (gzipped)
+* masked genomewide SYNC file (bgzipped and indexed with tabix)
+* mpileup file for the melanogaster reads (gzipped)
+
+### How to edit the pipeline script
+
+* ToDo: Create team on Docker to allow collaborative editing of containers
+
+* Comment out the lines in the Dockerfile defining the ```ENTRYPOINT``` and ```CMD```
+  * Build the docker on your personal computer using ```docker build -t <repo_name>/<image_tag>:<image_tag_version> .``` in the directory containing the Dockerfile (same as this README)
+  * An alternative to commenting out these lines is using the flag ```--entrypoint "/bin/bash"``` after the ```-it``` in the ```docker run``` command and make modifications/debug inside the container
+
+* Modify the pipeline script
+
+* Run the docker using volumes (-v flag) to bind any desired directories (including the one in which you are modifying the pipeline script) to the image instance and -it to make it interactive: ```docker run -v <local_path>:<docker_path> -it <image_name>```
+
+* Run the pipeline script, or any modifications you mean to make to the script, in this interactive version of the docker to debug, repeating the last two steps (or simply modifying the script within the interactive shell with vim) until you are satisfied with the changes.
+
+* Push your changes to https://github.com/alanbergland/DEST.git
+
+* Reassign the ARG CACHE_BUST line in the Dockerfile to the current month, day, year, and time so that the build process knows to rerun the following lines and repull the repo with the updated scripts.
+
+* Uncomment the ```ENTRYPOINT``` and ```CMD``` lines
+
+* Run the build process again, and test to make sure it works with ```docker run -v <local_path_to_fq_files>:/opt/data /opt/data/<sample_1> /opt/data/<sample_2> test_sample /opt/data/test_output <num_cores_to_use>```.
+
+* Check the output, then push to docker hub with ```docker push <repo_name>/<image_tag>:<image_tag_version> (e.g. docker push jho5ze/dmelsync:hpc)``` (currently you will have to make your own repo for this)
+  * Sometimes, you may need to give the image a new ```image_tag_version``` identifier in order for the push to reflect all the changes you made to the image.
+
+* Use ```singularity pull docker://<user>/<image_name>:<image_tag_version>``` to get the updated image on your cluster
+
+### How to edit the Docker image or tools used by the pipeline
+
+* Edit the Dockerfile to reflect your desired changes or install necessary software (using the unix syntax and apt tool)
+
+* Build and push the image as described above
