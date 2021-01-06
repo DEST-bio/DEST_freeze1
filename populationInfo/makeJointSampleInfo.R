@@ -3,7 +3,7 @@
 
 
 ### ijob -c1 -p standard -A berglandlab
-### module load intel/18.0 intelmpi/18.0 R/3.6.0; R
+### module load intel/18.0 intelmpi/18.0 R/3.6.3; R
 
 
 ### libraries
@@ -18,13 +18,14 @@
 	library(rnoaa)
 	library(sp)
 	library(rworldmap)
+	library(raster)
 
 ### set working directory
 	setwd("/scratch/aob2x/dest")
 
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
-		dat.drosEU <- read.xls("./DEST/populationInfo/DrosEU_allYears_180607.xlsx")
+		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/DrosEU_allYears_180607.xlsx")
 
 		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16)])
 		setnames(dat.drosEU.dt,
@@ -265,6 +266,52 @@
 
 			### the far stations are mostly in Africa
 				table(samps$set, samps$dist_km<20)
+
+
+	### worldclim data
+		# first load WC bio variables at the resolution of 2.5 deg
+		biod <- getData("worldclim", var="bio", res=2.5)
+		tmind <- getData("worldclim", var="tmin", res=2.5)
+		tmaxd <- getData("worldclim", var="tmax", res=2.5)
+		precd <- getData("worldclim", var="prec", res=2.5)
+		​
+		# read csv file with geographic coordinates
+		geod<-read.table("/Volumes/MartinResearch2/Wolf2019/analyses/AtheneNew/coordinates.txt", header=T, stringsAsFactors=F)
+		​
+		# extact for each coordinate bio clim variables
+		bio<-extract(biod, geod[,c(3,2)])
+		tmin<-extract(tmind, geod[,c(3,2)])
+		tmax<-extract(tmaxd, geod[,c(3,2)])
+		precd<-extract(precd, geod[,c(3,2)])
+		​
+		# create a full dataset
+		bio.data<-cbind(geod,bio,tmin,tmax,precd)
+		​
+		# save into external file
+		write.table(bio.data,file="/Volumes/MartinResearch2/Wolf2019/analyses/AtheneNew/coordinates-GIS.txt",sep="\t", row.names=FALSE ,quote=FALSE)
+		​
+		​
+		xx<- c(c(1:12,12:1),c(1:12,12:1),c(1:12,12:1))
+		yy <- c(c(tmin[1,]/10,rev(tmax[1,]/10)),c(tmin[2,]/10,rev(tmax[2,]/10)),c(tmin[3,]/10,rev(tmax[3,]/10)))
+		​
+		plot   (xx, yy, type = "n", xlab = "Months", ylab = "Temperature")
+
+		polygon(c(1:12,12:1),c(tmin[1,]/10,rev(tmax[1,]/10)),col = rgb(0,0,1,0.2),border="blue")
+		polygon(c(1:12,12:1),c(tmin[2,]/10,rev(tmax[2,]/10)),col = rgb(1,0,0,0.2),border="red")
+		#polygon(c(1:12,12:1),c(tmin[3,]/10,rev(tmax[3,]/10)),col = rgb(0.2,0.2,0.2,0.2), border = "green")
+		​
+		par(new = TRUE)
+		​
+		plot(1:12, precd[1,], type = "l", col = "blue",axes = FALSE, xlab = "", ylab = "",ylim=c(min(precd),max(precd)),lty=2,lwd=4)
+		points(1:12, precd[2,], type = "l", col = "red",lty=2,lwd=4)
+		#points(1:12, precd[3,], type = "l", col = "green",lty=2,lwd=2)
+		​
+		axis(side = 4, at = pretty(precd))
+		mtext("precipitation", side = 4, line = 3)
+		​
+
+
+
 
 	### save
 		write.csv(samps, "./DEST/populationInfo/samps.csv", quote=F, row.names=F)
