@@ -1,17 +1,9 @@
 # Population information & basic figures
 
 ## Description
->  This directory contains scripts to generate meta-data file for the DEST dataset. It first pulls together the meta-data files for the drosRTEC, drosEU, and dgn datasets from their respective supplemental data files. Also pulls in ghcnd data.
+>  This directory contains scripts to generate meta-data files for the DEST dataset.
 
-## File structure set up
+## collection metadata
+  > `DEST_freeze1/populationInfo/samps.csv` contains the collection information (locality, date, SRA accession, etc) as well as some environmental metadata (GHNCD, WorldClim)
 
-## Make meta-data file ###
-  > ~~ijob -c1 -p standard -A berglandlab~~
-  > RUN: `makeJointSampleInfo.R`
-  > Outputs `DEST/populationInfo/samps.csv`
-
-## Make figures
-  ## Map figure
-  > RUN: `sbatch makeNiceMap.sh`
-
-  python2.7 makeNiceMap.py input.txt > output.txt` <br/>
+  > `DEST_freeze1/populationInfo/makeJointSampleInfo.R` is the R script which makes `samps.csv`
