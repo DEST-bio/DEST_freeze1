@@ -82,8 +82,8 @@
 			### from two bio-projects:
 			### set1: https://www.ncbi.nlm.nih.gov/bioproject/PRJNA256231
 			### set2: https://www.ncbi.nlm.nih.gov/bioproject/PRJNA308584
-			drosRTEC.sra.1 <- fread("./DEST/populationInfo/drosRTEC_set1_SraRunInfo.txt")
-			drosRTEC.sra.2 <- fread("./DEST/populationInfo/drosRTEC_set2_SraRunInfo.txt")
+			drosRTEC.sra.1 <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosRTEC_set1_SraRunInfo.txt")
+			drosRTEC.sra.2 <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosRTEC_set2_SraRunInfo.txt")
 
 			setnames(drosRTEC.sra.1, c("Sample Name", "Run", "Experiment"), c("sra_sampleName", "SRA_accession", "SRA_experiment"))
 			setnames(drosRTEC.sra.2, c("Sample Name", "Run", "Experiment"), c("sra_sampleName", "SRA_accession", "SRA_experiment"))
@@ -105,7 +105,7 @@
 
 	### load in DPGP data
 		### first parse Individuals file to select which individuals; modified with population tag
-			dpgp.ind <- as.data.table(read.xls("./DEST/populationInfo/TableS1_individuals.xls", skip=5, header=T))
+			dpgp.ind <- as.data.table(read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/TableS1_individuals.xls", skip=5, header=T))
 			dpgp.ind <- dpgp.ind[Focal.Genome.Represented=="X,2L,2R,3L,3R"][,c("population", "Stock.ID", "Genome.Type", "Mean.Depth", "Data.Group")]
 			setnames(dpgp.ind, "population", "sampleId")
 
@@ -125,11 +125,11 @@
 				dpgp.ind.use <- rbind(dpgp.ind.use, data.table(sampleId="SIM", Stock.ID="Simulans", Genome.Type="inbred_line", Mean.Depth=NA, Data.Group="SIM", dgn_set="SIM/SIM", i.Genome.Type="inbred_line", i.dgn_set="SIM/SIM", n=1))
 
 
-			write.csv(dpgp.ind.use, "./DEST_freeze1/populationInfo/OriginalMetadata/dpgp.ind.use.csv", quote=F, row.names=F)
+				write.csv(dpgp.ind.use, "./DEST_freeze1/populationInfo/OriginalMetadata/dpgp.ind.use.csv", quote=F, row.names=F)
 
 		### Get population metadata
 		### http://johnpool.net/TableS2_populations.xls
-			dat.dpgp <- read.xls("./DEST/populationInfo/TableS2_populations.xls", skip=4)
+			dat.dpgp <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/TableS2_populations.xls", skip=4)
 
 
 			dat.dpgp.dt <- as.data.table(dat.dpgp[,c(1,1, 2,3,4,6,7)])
