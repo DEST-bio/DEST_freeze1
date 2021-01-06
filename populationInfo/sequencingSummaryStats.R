@@ -103,7 +103,6 @@
   write.csv(simContam.ag, file="/scratch/aob2x/dest/DEST_freeze1/populationInfo/sequencingStats/simulans.csv", row.names=F)
 
 
-###
 
 
 

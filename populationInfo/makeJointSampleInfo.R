@@ -25,7 +25,7 @@
 
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
-		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/DrosEU_allYears_180607.xlsx")
+		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607.xlsx")
 
 		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16)])
 		setnames(dat.drosEU.dt,
@@ -50,7 +50,7 @@
 
 
 		### add in SRA accession numbers from separate file
-			drosEU.sra <- fread("./DEST/populationInfo/drosEU_SraRunInfo.csv")
+			drosEU.sra <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosEU_SraRunInfo.csv")
 			setnames(drosEU.sra, c("LibraryName", "Run", "Experiment"), c("sampleId", "SRA_accession", "SRA_experiment"))
 
 			dat.drosEU.dt <- merge(dat.drosEU.dt, drosEU.sra[,c("sampleId", "SRA_accession", "SRA_experiment"),with=F], by="sampleId", all=T)
@@ -58,7 +58,7 @@
 
 
 	### load in DrosRTEC data
-		dat.drosRTEC <- read.xls("./DEST/populationInfo/vcf_popinfo_Oct2018.xlsx")
+		dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
 
 		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 4)])
 		setnames(dat.drosRTEC.dt,
@@ -125,7 +125,7 @@
 				dpgp.ind.use <- rbind(dpgp.ind.use, data.table(sampleId="SIM", Stock.ID="Simulans", Genome.Type="inbred_line", Mean.Depth=NA, Data.Group="SIM", dgn_set="SIM/SIM", i.Genome.Type="inbred_line", i.dgn_set="SIM/SIM", n=1))
 
 
-			write.csv(dpgp.ind.use, "./DEST/populationInfo/dpgp.ind.use.csv", quote=F, row.names=F)
+			write.csv(dpgp.ind.use, "./DEST_freeze1/populationInfo/OriginalMetadata/dpgp.ind.use.csv", quote=F, row.names=F)
 
 		### Get population metadata
 		### http://johnpool.net/TableS2_populations.xls
