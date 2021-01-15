@@ -60,7 +60,7 @@
 	### load in DrosRTEC data
 		dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
 
-		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 4)])
+		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3)])
 		setnames(dat.drosRTEC.dt,
 				names(dat.drosRTEC.dt),
 				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality"))
@@ -243,7 +243,8 @@
 				}
 			}
 
-
+			library(doMC)
+			registerDoMC(20)
 			o <- foreach(i=1:dim(samps)[1])%dopar%{
 				print(i)
 				getBestStation(lat=samps[i]$lat, long=samps[i]$long, year=samps[i]$year, threshold=4)
@@ -270,48 +271,24 @@
 
 	### worldclim data
 		# first load WC bio variables at the resolution of 2.5 deg
-		biod <- getData("worldclim", var="bio", res=2.5)
-		tmind <- getData("worldclim", var="tmin", res=2.5)
-		tmaxd <- getData("worldclim", var="tmax", res=2.5)
-		precd <- getData("worldclim", var="prec", res=2.5)
-		​
-		# read csv file with geographic coordinates
-		geod<-read.table("/Volumes/MartinResearch2/Wolf2019/analyses/AtheneNew/coordinates.txt", header=T, stringsAsFactors=F)
+			biod <- getData("worldclim", var="bio", res=2.5)
+			tmind <- getData("worldclim", var="tmin", res=2.5)
+			tmaxd <- getData("worldclim", var="tmax", res=2.5)
+			precd <- getData("worldclim", var="prec", res=2.5)
+			​
 		​
 		# extact for each coordinate bio clim variables
-		bio<-extract(biod, geod[,c(3,2)])
-		tmin<-extract(tmind, geod[,c(3,2)])
-		tmax<-extract(tmaxd, geod[,c(3,2)])
-		precd<-extract(precd, geod[,c(3,2)])
-		​
+			bio<-extract(biod, samps[,c("long", "lat"), with=F])
+			tmin<-extract(tmind, samps[,c("long", "lat"), with=F])
+			tmax<-extract(tmaxd, samps[,c("long", "lat"), with=F])
+			precd<-extract(precd, samps[,c("long", "lat"), with=F])
+			​
 		# create a full dataset
-		bio.data<-cbind(geod,bio,tmin,tmax,precd)
+			bio.data <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
 		​
 		# save into external file
-		write.table(bio.data,file="/Volumes/MartinResearch2/Wolf2019/analyses/AtheneNew/coordinates-GIS.txt",sep="\t", row.names=FALSE ,quote=FALSE)
+			write.csv(bio.data, file="./DEST_freeze1/populationInfo/dest.worldclim.csv", row.names=FALSE)
 		​
 		​
-		xx<- c(c(1:12,12:1),c(1:12,12:1),c(1:12,12:1))
-		yy <- c(c(tmin[1,]/10,rev(tmax[1,]/10)),c(tmin[2,]/10,rev(tmax[2,]/10)),c(tmin[3,]/10,rev(tmax[3,]/10)))
-		​
-		plot   (xx, yy, type = "n", xlab = "Months", ylab = "Temperature")
-
-		polygon(c(1:12,12:1),c(tmin[1,]/10,rev(tmax[1,]/10)),col = rgb(0,0,1,0.2),border="blue")
-		polygon(c(1:12,12:1),c(tmin[2,]/10,rev(tmax[2,]/10)),col = rgb(1,0,0,0.2),border="red")
-		#polygon(c(1:12,12:1),c(tmin[3,]/10,rev(tmax[3,]/10)),col = rgb(0.2,0.2,0.2,0.2), border = "green")
-		​
-		par(new = TRUE)
-		​
-		plot(1:12, precd[1,], type = "l", col = "blue",axes = FALSE, xlab = "", ylab = "",ylim=c(min(precd),max(precd)),lty=2,lwd=4)
-		points(1:12, precd[2,], type = "l", col = "red",lty=2,lwd=4)
-		#points(1:12, precd[3,], type = "l", col = "green",lty=2,lwd=2)
-		​
-		axis(side = 4, at = pretty(precd))
-		mtext("precipitation", side = 4, line = 3)
-		​
-
-
-
-
 	### save
-		write.csv(samps, "./DEST/populationInfo/samps.csv", quote=F, row.names=F)
+		write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
