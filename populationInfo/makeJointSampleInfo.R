@@ -9,7 +9,6 @@
 ### libraries
 	library(data.table)
 	library(gdata)
-	#library(cowplot)
 	library(foreach)
 	library(ggplot2)
 	library(ggmap)
@@ -25,7 +24,7 @@
 
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
-		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607.xlsx")
+		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607_ki.xlsx")
 
 		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16)])
 		setnames(dat.drosEU.dt,
@@ -44,9 +43,9 @@
 		dat.drosEU.dt[,lat:=as.numeric(as.character(lat))]
 		dat.drosEU.dt[,long:=as.numeric(as.character(long))]
 
-		### change the spelling of 5 Ukranian samples to correct for differences in spelling
-			dat.drosEU.dt[grepl("UA_Cho_14", sampleId), sampleId:=gsub("UA_Cho_14", "UA_Che_14", sampleId)]
-			dat.drosEU.dt[grepl("UA_Pyr_14", sampleId), sampleId:=gsub("UA_Pyr_14", "UA_Pir_14", sampleId)]
+		#### change the spelling of 5 Ukranian samples to correct for differences in spelling
+		#	dat.drosEU.dt[grepl("UA_Cho_14", sampleId), sampleId:=gsub("UA_Cho_14", "UA_Che_14", sampleId)]
+		#	dat.drosEU.dt[grepl("UA_Pyr_14", sampleId), sampleId:=gsub("UA_Pyr_14", "UA_Pir_14", sampleId)]
 
 
 		### add in SRA accession numbers from separate file
@@ -292,3 +291,14 @@
 		​
 	### save
 		write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
+
+
+	### quick summary
+		samps.ag <- samps[,list(nSamps=length(locality),
+							nSpring=sum(season=="spring"),
+							nFall=sum(season=="fall"),
+							nTime=length(unique(collectionDate)),
+							maxDelta=max(yday) - min(yday),
+							lat.u=length(unique(round(lat, 1))),
+							long.u=length(unique(round(long, 1)))),
+					list(locality, continent, set)]
