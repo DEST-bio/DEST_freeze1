@@ -1,6 +1,5 @@
 ### module load intel/18.0 intelmpi/18.0 R/3.6.3; R
 
-
 ### libraries
   library(SeqArray)
   library(data.table)
