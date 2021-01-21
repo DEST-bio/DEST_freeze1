@@ -86,4 +86,3 @@ sbatch ${wd}/DEST/snpCalling/annotate.sh PoolSeq SNAPE NA NA 10Nov2020
 
   parallel -j 1 runJob ::: 001 01 05 ::: 5 10 15 20 50 100
 ```
-cp /scratch/aob2x/dest/dest*paramTest*.ann.vcf.gz /project/berglandlab/DEST/paramTest/.
