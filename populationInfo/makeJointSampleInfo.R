@@ -24,12 +24,13 @@
 
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
-		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607_ki.xlsx")
+		#dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607_ki.xlsx")
+		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_210120.xlsx")
 
-		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16)])
+		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16,17)])
 		setnames(dat.drosEU.dt,
 				names(dat.drosEU.dt),
-				c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long", "season", "nAutosomes"))
+				c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long", "season", "nAutosomes", "collector"))
 		dat.drosEU.dt[,locality:=paste(tstrsplit(sampleId, "_")[[1]],
 									tstrsplit(sampleId, "_")[[2]], sep="_")]
 		dat.drosEU.dt[season=="S", season:="spring"]
@@ -42,6 +43,9 @@
 		dat.drosEU.dt[,nAutosomes:=NULL]
 		dat.drosEU.dt[,lat:=as.numeric(as.character(lat))]
 		dat.drosEU.dt[,long:=as.numeric(as.character(long))]
+		dat.drosEU.dt[,collector:=gsub(",", ";", collector)]
+		dat.drosEU.dt[,collector:=gsub(" ", "_", collector)]
+
 
 		#### change the spelling of 5 Ukranian samples to correct for differences in spelling
 		#	dat.drosEU.dt[grepl("UA_Cho_14", sampleId), sampleId:=gsub("UA_Cho_14", "UA_Che_14", sampleId)]
@@ -52,17 +56,17 @@
 			drosEU.sra <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosEU_SraRunInfo.csv")
 			setnames(drosEU.sra, c("LibraryName", "Run", "Experiment"), c("sampleId", "SRA_accession", "SRA_experiment"))
 
-			dat.drosEU.dt <- merge(dat.drosEU.dt, drosEU.sra[,c("sampleId", "SRA_accession", "SRA_experiment"),with=F], by="sampleId", all=T)
+			dat.drosEU.dt <- merge(dat.drosEU.dt, drosEU.sra[,c("sampleId", "SRA_accession", "SRA_experiment", "Model"),with=F], by="sampleId", all=T)
 			dat.drosEU.dt <- dat.drosEU.dt[!is.na(set)]
 
 
 	### load in DrosRTEC data
 		dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
 
-		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3)])
+		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3, 20)])
 		setnames(dat.drosRTEC.dt,
 				names(dat.drosRTEC.dt),
-				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality"))
+				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality", "collector"))
 		dat.drosRTEC.dt[,type:="pooled"]
 		#dat.drosRTEC.dt[,collectionDate := as.POSIXct(collectionDate)]
 		dat.drosRTEC.dt[long>0,continent:="Europe"]
@@ -71,6 +75,8 @@
 		dat.drosRTEC.dt[,lat:=as.numeric(as.character(lat))]
 		dat.drosRTEC.dt[,long:=as.numeric(as.character(long))]
 		dat.drosRTEC.dt[,collectionDate:=gsub("-", "/", collectionDate)]
+		dat.drosRTEC.dt[,collector:=gsub(",", ";", collector)]
+		dat.drosRTEC.dt[,collector:=gsub(" ", "_", collector)]
 
 		### fix issue with SRA_accession numbers for a few Maine populations
 			#dat.drosRTEC.dt[sampleId=="ME_bo_09_fall.r1", SRA_accession:="SRX661844"]
@@ -84,14 +90,14 @@
 			drosRTEC.sra.1 <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosRTEC_set1_SraRunInfo.txt")
 			drosRTEC.sra.2 <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosRTEC_set2_SraRunInfo.txt")
 
-			setnames(drosRTEC.sra.1, c("Sample Name", "Run", "Experiment"), c("sra_sampleName", "SRA_accession", "SRA_experiment"))
-			setnames(drosRTEC.sra.2, c("Sample Name", "Run", "Experiment"), c("sra_sampleName", "SRA_accession", "SRA_experiment"))
+			setnames(drosRTEC.sra.1, c("Sample Name", "Run", "Experiment", "Instrument"), c("sra_sampleName", "SRA_accession", "SRA_experiment", "Model"))
+			setnames(drosRTEC.sra.2, c("Sample Name", "Run", "Experiment", "Instrument"), c("sra_sampleName", "SRA_accession", "SRA_experiment", "Model"))
 
 			drosRTEC.sra.1[SRA_accession=="SRR1525694", sra_sampleName:="FL_rep2"]
 			drosRTEC.sra.2 <- drosRTEC.sra.2[!sra_sampleName%in%c("PA_2012_FAT", "VI_2012_FAT", "mel14TWA7")]
 
-			drosRTEC.sra <- rbind(drosRTEC.sra.1[,c("sra_sampleName", "SRA_accession", "SRA_experiment"),with=F],
-														drosRTEC.sra.2[,c("sra_sampleName", "SRA_accession", "SRA_experiment"),with=F])
+			drosRTEC.sra <- rbind(drosRTEC.sra.1[,c("sra_sampleName", "SRA_accession", "SRA_experiment", "Model"),with=F],
+														drosRTEC.sra.2[,c("sra_sampleName", "SRA_accession", "SRA_experiment", "Model"),with=F])
 
 			dat.drosRTEC.dt <- merge(dat.drosRTEC.dt, drosRTEC.sra, by="sra_sampleName", all=T)
 
@@ -131,14 +137,18 @@
 			dat.dpgp <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/TableS2_populations.xls", skip=4)
 
 
-			dat.dpgp.dt <- as.data.table(dat.dpgp[,c(1,1, 2,3,4,6,7)])
+			dat.dpgp.dt <- as.data.table(dat.dpgp[,c(1,1, 2,3,4,6,7,5)])
 			setnames(dat.dpgp.dt,
 					names(dat.dpgp.dt),
-					c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long"))
+					c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long", "collector"))
 
 			setkey(dat.dpgp.dt, sampleId)
 			setkey(dpgp.ind.use, sampleId)
 			dat.dpgp.dt <- merge(dat.dpgp.dt, dpgp.pop.use)
+			dat.dpgp.dt[,collector:=gsub(",", ";", collector)]
+			dat.dpgp.dt[,collector:=gsub(" & ", ";", collector)]
+			dat.dpgp.dt[,collector:=gsub(" ", "_", collector)]
+
 
 	### get the DPGP populations that are being used in this biuld of the data
 	### the script which makes this file is here: DEST/add_DGN_data/pop_chr_maker.sh
@@ -190,16 +200,22 @@
 			dat.dpgp.dt[!is.na(lat), continent:=gsub(" ", "_", as.character(coords2continent(na.omit(as.matrix(dat.dpgp.dt[,c("long", "lat"),with=F])))))]
 			dat.dpgp.dt[,SRA_accession:=NA]
 			dat.dpgp.dt[,SRA_experiment:=NA]
+			dat.dpgp.dt[,Model:=NA]
+
 			setnames(dat.dpgp.dt, "n", "nFlies")
 			setnames(dat.dpgp.dt, "Genome.Type", "type")
 
 	### combine,
-		columns2use <- c("sampleId", "country", "city", "collectionDate", "lat", "long", "season", "locality", "type", "continent", "set", "nFlies", "SRA_accession", "SRA_experiment")
+		columns2use <- c("sampleId", "country", "city",
+											"collectionDate", "lat", "long", "season", "locality",
+											"type", "continent", "set", "nFlies",
+											"SRA_accession", "SRA_experiment",
+											"Model", "collector")
 
 
 		samps <- rbindlist(list(dat.drosEU.dt[,columns2use,with=F],
 												 		dat.drosRTEC.dt[,columns2use,with=F],
-														dat.dpgp.dt[,columns2use,with=F]))
+														dat.dpgp.dt[,columns2use,with=F]), fill=T)
 
 
 		samps[,year := as.numeric(tstrsplit(collectionDate, "/")[[1]])]
@@ -290,10 +306,12 @@
 		​
 		​
 	### save
+		setnames(samps, "Model", "SeqPlatform")
 		write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
 
 
 	### quick summary
+		samps <- fread("./DEST_freeze1/populationInfo/samps.csv")
 		samps.ag <- samps[,list(nSamps=length(locality),
 							nSpring=sum(season=="spring"),
 							nFall=sum(season=="fall"),
