@@ -11,8 +11,7 @@
   > `add_DGN_datda\`: Downloads, formats, lifts-over DGN data into gSYNC format
 
 ## SNP calling
-  > `PoolSNP4Sync\`: SNP calling based on gSYNC files </br>
-  > `SNAPE\`: SNP calling based on snape output
+  > `snpCalling`: SNP calling based on gSYNC files </br>
 
 ## Utility scripts
   > `utility\`: (a) download individual files; (b)
