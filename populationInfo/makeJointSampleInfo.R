@@ -25,12 +25,12 @@
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
 		#dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607_ki.xlsx")
-		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_210120.xlsx")
+		dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_210120.xlsx", skip=1, header=F)
 
-		dat.drosEU.dt <- as.data.table(dat.drosEU[-1,c(2,2,5,6,7,12,13,15,16,17)])
+		dat.drosEU.dt <- as.data.table(dat.drosEU[,c(2,2,5,6,7,12,13,15,16,17,18)])
 		setnames(dat.drosEU.dt,
 				names(dat.drosEU.dt),
-				c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long", "season", "nAutosomes", "collector"))
+				c("sampleId", "sequenceId", "country", "city", "collectionDate", "lat", "long", "season", "nAutosomes", "collector", "sampleType"))
 		dat.drosEU.dt[,locality:=paste(tstrsplit(sampleId, "_")[[1]],
 									tstrsplit(sampleId, "_")[[2]], sep="_")]
 		dat.drosEU.dt[season=="S", season:="spring"]
@@ -45,7 +45,8 @@
 		dat.drosEU.dt[,long:=as.numeric(as.character(long))]
 		dat.drosEU.dt[,collector:=gsub(",", ";", collector)]
 		dat.drosEU.dt[,collector:=gsub(" ", "_", collector)]
-
+		dat.drosEU.dt[sampleType=="Yes", sampleType:="wild"]
+		dat.drosEU.dt[sampleType!="wild", sampleType:="wild_caught_and_F1"]
 
 		#### change the spelling of 5 Ukranian samples to correct for differences in spelling
 		#	dat.drosEU.dt[grepl("UA_Cho_14", sampleId), sampleId:=gsub("UA_Cho_14", "UA_Che_14", sampleId)]
@@ -63,10 +64,10 @@
 	### load in DrosRTEC data
 		dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
 
-		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3, 20)])
+		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3, 20,29)])
 		setnames(dat.drosRTEC.dt,
 				names(dat.drosRTEC.dt),
-				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality", "collector"))
+				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality", "collector", "sampleType"))
 		dat.drosRTEC.dt[,type:="pooled"]
 		#dat.drosRTEC.dt[,collectionDate := as.POSIXct(collectionDate)]
 		dat.drosRTEC.dt[long>0,continent:="Europe"]
@@ -148,7 +149,7 @@
 			dat.dpgp.dt[,collector:=gsub(",", ";", collector)]
 			dat.dpgp.dt[,collector:=gsub(" & ", ";", collector)]
 			dat.dpgp.dt[,collector:=gsub(" ", "_", collector)]
-
+			dat.dpgp.dt[,sampleType:="NA"]
 
 	### get the DPGP populations that are being used in this biuld of the data
 	### the script which makes this file is here: DEST/add_DGN_data/pop_chr_maker.sh
@@ -210,14 +211,15 @@
 											"collectionDate", "lat", "long", "season", "locality",
 											"type", "continent", "set", "nFlies",
 											"SRA_accession", "SRA_experiment",
-											"Model", "collector")
+											"Model", "collector", "sampleType")
 
 
 		samps <- rbindlist(list(dat.drosEU.dt[,columns2use,with=F],
 												 		dat.drosRTEC.dt[,columns2use,with=F],
 														dat.dpgp.dt[,columns2use,with=F]), fill=T)
 
-
+		samps[sampleType=="NA", sampleType:=NA]
+		samps[,sampleType:=as.character(sampleType)]
 		samps[,year := as.numeric(tstrsplit(collectionDate, "/")[[1]])]
 
 		samps[grepl("[0-9]{4}/[0-9]{2}/[0-9]{2}", collectionDate),yday := yday(as.POSIXct(collectionDate))]
@@ -283,6 +285,8 @@
 			### the far stations are mostly in Africa
 				table(samps$set, samps$dist_km<20)
 
+			### sample type
+				table(samps$sampleType)
 
 	### worldclim data
 		# first load WC bio variables at the resolution of 2.5 deg
