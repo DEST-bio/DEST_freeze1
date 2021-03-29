@@ -314,6 +314,16 @@
 		write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
 
 
+	### combine samps & worldclim
+		library(data.table)
+		setwd("/scratch/aob2x/dest")
+		samps <- fread("./DEST_freeze1/populationInfo/samps.csv")
+		worldclim <- fread(file="./DEST_freeze1/populationInfo/dest.worldclim.csv")
+
+		sw <- merge(samps, worldclim, by="sampleId", all.x=T)
+		write.csv(sw, "./DEST_freeze1/populationInfo/samps_worldclim.csv", quote=F, row.names=F)
+
+
 	### quick summary
 		samps <- fread("./DEST_freeze1/populationInfo/samps.csv")
 		samps.ag <- samps[,list(nSamps=length(locality),
