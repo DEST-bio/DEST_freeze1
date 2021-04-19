@@ -14,7 +14,7 @@ Prior to running this script, or any other in this pipeline for that matter, we 
 
 ```bash
 #example
-wd=/scratch/yey2sn/DEST_example
+wd=./DEST_example
 ```
 
 ### Clone our git repo
@@ -117,7 +117,7 @@ The second part of the script executes the Docker image.  This script uses the r
 * **do-snape:** When this option is declared the pipeline runs the SNAPE-pooled program on the data. Notice that to run this option, you must also run the pool_SNP option first ("do_poolsnp" must be declared before the do-snape option).
 * **dont-prep:** This option is off by default. However, when this option is declared, the pipeline only runs partially and does not map reads. Instead, the program starts from the bam file stage.
 
-Please see all the option available [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/fq_to_sync_pipeline.sh)</br>.
+Please see all the options available [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/fq_to_sync_pipeline.sh).</br>
  
 ```bash
 # This is an example. Do not Run

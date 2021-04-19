@@ -13,14 +13,14 @@ As before, be advised that this script assumes that the user will run the progra
 ### Define working directory 
 
 ```bash
-wd=/scratch/yey2sn/DEST_example/SNPcalling
+wd=./DEST_freeze1/snpCalling/
 ```
 
 ## Define the fai file corresponding to the reference genome
 The file "holo_dmel_6.12.fa.fai" is the fai file generated from indexing the reference genome (in this case the holo-genome) we used to map reads. This is a file of small size which we will provide in the git repo, but can be generated using samtools.
 
 ```bash
-fai=/project/berglandlab/Dmel_fasta_refences/holo_dmel_6.12.fa.fai
+fai=${wd}/holo_dmel_6.12.fa.fai
 ```
 ## Part 1. Generate a master "guide file" for jobs.
 This will help paralelize the pipeline, optimizing memory and time. This step requires the fai file as well as running R. Notice that our example shows a very idiosyncratic way to load R. This is probably only applicable to our super computer. Please modify accordingly
