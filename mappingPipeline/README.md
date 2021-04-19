@@ -1,37 +1,158 @@
 # Scripts to download, map, call polymorphism in pooled sequencing data-sets for Drosophila
 
 ## Description
-> This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline.
 
-### 0. Define working directory
+This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline. 
+
+This script is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps. On the other hand, those using the data set on new data may start the pipeline at a different point depending if the data is to be downloaded from the SRA archive or if it exist locally in the user's cluster. 
+
+Please be advised that this script assumes that the user will run the program on a cluster computer as it takes advantage of array jobs. Nevertheless, the script can be modified to run on a different configuration. 
+
+## Before we start: Download the DEST pipeline
+### Define working directory
+Prior to running this script, or any other in this pipeline for that matter, we advise the user to define a working directory link (e.g., stored in a variable). We assume that the git repo will be cloned here
+
 ```bash
-wd=/scratch/aob2x/dest
+#example
+wd=/scratch/yey2sn/DEST_example
 ```
 
-### 1. Download data from SRA (specify 72 hour time limit)
+### Clone our git repo
+
 ```bash
-sbatch --array=1-$( wc -l < ${wd}/DEST/populationInfo/samps.csv ) \
-${wd}/DEST/mappingPipeline/scripts/downloadSRA.sh
+cd ${wd}
+git clone https://github.com/DEST-bio/DEST_freeze1.git
 ```
 
-### 2. Check that data are in the correct FASTQ format
-Double check that all downloaded data are in Fastq33. Uses script from [here](https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py). </br>
+### Create a folder to store the SLURM output (e.g. ".out" and ".err")
+This is optional. However, all of our scripts assume that all SLURM output will be dumped into a common folder created in the working folder, i.e., ${wd}.
+```bash
+mkdir ${wd}/slurmOutput
+```
+Now we can proceed to download some data
+
+## Obtaining and preparing the data
+
+### If the data is to be downloaded from the SRA
+We have included in our pipeline a script designed to download SRA data from NCBI to the user's cluster.  This script can be found [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/download_SRA.sh).</br>
+
+#### Download data from SRA (specify 72 hour time limit)
+This script uses the sratoolkit/2.10.5 to download desired samples from NCBI. For this script to run properly, the user will need to have installed the sratoolkit.  The user will also need a metadata file. This is looks like  [this](https://github.com/DEST-bio/DEST_freeze1/blob/main/populationInfo/samps.csv)</br> and our code depends on it to extract the information needed to complete the pipeline. In our particular case, our metadata file is  a csv file calles "samps.csv" and can be found in the repo in /DEST/populationInfo/
+
+**about the script:** our script is launched using an array job of *1-N*, where *N* is the numbre of lines in the metadata file (thus we assume that there is one SRA file per metadata line). Because the metadata file has a header, we remove the first line. **Also, remember to modify the SLURM header of the script so it can be run in the user's cluster.** The script has requires **two** user inputs: First, the metadata file (e.g.,  ./downloadSRA.sh "metadata_file") the exact format shown [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/populationInfo/samps.csv)</br> . Second, the location of the output file where the reads will be stored.
 
 ```bash
-sbatch ${wd}/DEST/mappingPipeline/scripts/check_fastq_encoding.sh
+sbatch --array=1-$( sed '1d' ${wd}/DEST_freeze1/populationInfo/samps.csv | wc -l  ) \
+${wd}/DEST_freeze1/mappingPipeline/scripts/download_SRA.sh  \
+${wd}/DEST_freeze1/populationInfo/samps.csv \
+${wd}/fastq
+```
+**Expected Output:** This script will produce fastq files in the form of SRR_1.fastq.gz. Where "_1" or "_2" are the forward and reverse reads of each run.
+
+### If the data exist locally
+If the data exist locally, i.e. pair-end reads, you must ensure that the file names have a structure that is identical to the expected outcome described above, e.g., FILEID_1.fastq.gz.
+It is a good idea to rename your files to rename your files using this uniform convention
+```bash
+#For example
+mv .../myfile.F.some_name.fastq.gz ./ID_1.fastq.gz 
+mv .../myfile.R.some_name.fastq.gz ./ID_2.fastq.gz 
+#Where "ID" is some identifier which makes sense to the user...
+```
+## Check that data are in the correct FASTQ format
+Double check that all downloaded data are in Fastq33. Uses script from [here](https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py). </br> This script has 2 inputs: the location of the repo and the place where the reads are stored 
+
+```bash
+sbatch ${wd}/DEST_freeze1/mappingPipeline/scripts/check_fastq_encoding.sh \
+${wd}/DEST_freeze1 \
+${wd}/fastq
+
+#Finally run to show what files which have a different encoding.
 grep -v "1.8" ${wd}/fastq/qualEncodings.delim
 ```
 
-### 3. Build singularity container from docker image
+## Build singularity container from docker image
+Download (and create the SIF image of) the docker image of the DEST mapping pipeline. This process may take a few minutes.
 ```bash
-cd ${wd}
 module load singularity
-singularity pull docker://jho5ze/dmelsync:hpc
-#singularity pull docker://alanbergland/dest_mapping:latest
+singularity pull docker://destbiodocker/destbiodocker
 ```
 
-### 4. Run the singularity container across list of populations
+## Pipeline options
+These are the details of the array job script [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh)</br>  which executes the mapping pipeline. This script can run the pipeline in its entirety (from Fastq to final file), or partially. As such, it requires user attention on a couple of important options.
+
+### User input for the script
+The script takes 4 inputs:
+1. Current folder address (where the SIF image is located)
+2. The address to the folder containing the reads
+3. The address to the output folder
+4. The address to the metadata file
+
 ```bash
-sbatch --array=2-$( cat ${wd}/DEST/populationInfo/samps.csv | cut -f1,14 -d',' | grep -v "NA" | wc -l ) \
-${wd}/DEST/mappingPipeline/scripts/runDocker.sh
+### This is an example
+runDocker.sh \
+<arg $1: working dir of the SIF file> \
+<arg $2: reads> \
+<arg $3: output folder> \
+<arg $4: metadata>
 ```
+### Options of the script
+Our code has 2 parts. The first part "Get Sample information" leverages the array job task id "SLURM_ARRAY_TASK_ID" to iterate over the metadata file and extract all important information about the files. Accordingly, the script removes the header of the meatadata file and saves the population name "pop", SRX id "srx", and the number of flies pooled "numFlies". The script assumes that this information corresponds to the columns 1, 14, and 12, respectively in the metadata file (here stored in the $4 variable; i.e., argument 4) --> [make sure the file looks like this](https://github.com/DEST-bio/DEST_freeze1/blob/main/populationInfo/samps.csv)</br>.
+
+**If the data runs locally:** It is important to note that the script can be modified to run on local data by modifying the "srx=<...>" portion of the code below to ensure the code is capturing the name of the reads. One option is to modify column 14 of metadata file to reflect the correct name of the reads file.
+
+```bash
+# This is an example. Do not Run
+###################################
+# Part  1. Get Sample information #
+###################################
+
+  pop=$( cat $4  | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f1 -d',' )
+  srx=$( cat $4 | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
+  numFlies=$( cat $4  | sed '1d' | cut -f1,12 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
+  
+```
+The second part of the script executes the Docker image.  This script uses the reads in the format  "${srx}_1.fastq.gz". Here is an example of three of the core options:
+
+* **do_poolsnp:** When this option is declared the pipeline runs the poolsnp program on the data.
+* **do-snape:** When this option is declared the pipeline runs the SNAPE-pooled program on the data. Notice that to run this option, you must also run the pool_SNP option first ("do_poolsnp" must be declared before the do-snape option).
+* **dont-prep:** This option is off by default. However, when this option is declared, the pipeline only runs partially and does not map reads. Instead, the program starts from the bam file stage.
+
+Please see all the option available [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/fq_to_sync_pipeline.sh)</br>.
+ 
+```bash
+# This is an example. Do not Run
+###################################
+# Part  2. Run Docker             #
+###################################
+
+  module load singularity
+
+  singularity run \
+  $1/destbiodocker_latest.sif \
+  $2/${srx}_1.fastq.gz \
+  $2/${srx}_2.fastq.gz \
+  ${pop} \
+  $3 \
+  --cores $SLURM_CPUS_PER_TASK \
+  --max-cov 0.95 \
+  --min-cov 4 \
+  --base-quality-threshold 25 \
+  --num-flies ${numFlies} \
+  --do_poolsnp \
+  --do-snape 
+  
+```
+## Running the singularity container across list of populations
+Finally, the user can run the pipeline on their data using the following array job:
+```bash
+sbatch --array=1-$( sed '1d' ${wd}/DEST_freeze1/populationInfo/samps.csv | wc -l  ) \
+${wd}/DEST_freeze1/mappingPipeline/scripts/runDocker.sh \ # The script
+${wd} \ # Argument 1: Where the SIF file is located
+${wd}/fastq \ # Argument 2: Where the reads are located
+${wd}/pipeline_output \ # Argument 3: Output folder
+${wd}/DEST_freeze1/populationInfo/samps.csv
+```
+
+After this step has been completed, you are ready to move to the second step of the pipeline. "SNP calling, VCF and GDS generation"
+
+
