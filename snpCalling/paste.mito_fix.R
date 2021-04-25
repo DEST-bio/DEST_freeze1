@@ -26,12 +26,19 @@ jobId=gsub("mitochondrionGenome", "mitochondrion_genome", jobId)
 
   setwd(tmpdir)
 
-  chrom_name = rev(tstrsplit(jobId, "_"))[[3]]
+  chrom_name = rev(tstrsplit(jobId, "_"))[3]
   if (chrom_name == "genome") chrom_name = "mitochondrion_genome"
 
-  start = rev(tstrsplit(jobId, "_"))[[2]]
-  end = rev(tstrsplit(jobId, "_"))[[1]]
+  start = rev(tstrsplit(jobId, "_"))[2]
+  end = rev(tstrsplit(jobId, "_"))[1]
 
+print(chrom_name)
+print(tstrsplit(jobId, "_")[[1]])
+print(start)
+print(tstrsplit(jobId, "_")[[2]])
+print(end)
+print(tstrsplit(jobId, "_")[[3]])
+    
   #files <- files[-1]
 ### import
   o <- foreach(files.i=files, .errorhandling="pass")%do%{
@@ -39,7 +46,7 @@ jobId=gsub("mitochondrionGenome", "mitochondrion_genome", jobId)
     tmp <- fread(files.i)
     if(dim(tmp)[1]==0) {
       tmp <- data.table(V1=chrom_name,
-                        V2=start:end,
+                        V2=as.numeric(start):as.numeric(end),
                         V3="N",
                         V4=".:.:.:.:.:.")
     }
@@ -62,6 +69,8 @@ jobId=gsub("mitochondrionGenome", "mitochondrion_genome", jobId)
   setkey(ow.ref, V1, V2)
 
   owr <- merge(ow.ref, ow)
+
+  print(owr)
 
 ### output
   write.table(owr, quote=F, row.names=F, col.names=F, sep="\t", file=paste(tmpdir, "/allpops.", method, ".sites", sep=""))

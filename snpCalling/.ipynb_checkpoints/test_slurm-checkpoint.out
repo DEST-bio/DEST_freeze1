@@ -1,0 +1,21 @@
+
+subset
+PoolSNP PoolSNP
+:_
+[E::hts_open_format] Failed to open file test/data/:
+Could not read test/data/:
+all_
+[E::hts_open_format] Failed to open file all
+Could not read all
+B_
+[E::hts_open_format] Failed to open file B.masked.sync.gz
+Could not read B.masked.sync.gz
+CO_
+[E::hts_open_format] Failed to open file CO.masked.sync.gz
+Could not read CO.masked.sync.gz
+:_
+[E::hts_open_format] Failed to open file test/data/all/:
+Could not read test/data/all/:
+AT_gr_12_fall_
+[E::hts_open_format] Failed to open file AT_gr_12_fall.masked.sync.gz
+Could not read AT_gr_12_fall.masked.sync.gz

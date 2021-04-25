@@ -11,9 +11,8 @@ mac=${4}
 version=${5}
 wd=${6}
 outdir=$wd/sub_vcfs
-chr=${7}
 
-# chr=$( cat ${wd}/poolSNP_jobs.csv | cut -f1 -d',' | sort | uniq | sed "${SLURM_ARRAY_TASK_ID}q;d" )
+chr=$( cat ${wd}/poolSNP_jobs.csv | cut -f1 -d',' | sort | uniq | sed "${SLURM_ARRAY_TASK_ID}q;d" )
 
 echo "Chromosome: $chr"
 

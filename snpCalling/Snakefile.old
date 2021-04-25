@@ -1,0 +1,100 @@
+import os
+from pathlib import Path
+
+configfile: "workflow.yaml"
+
+CHRS=["2L", "2R", "3L", "3R", "4", "X", "Y", "mitochondrion_genome"]
+
+poolseq_path = Path(config["poolseq_sync_directory"])
+other_path = Path(config["other_sync_directory"])
+
+input_sync_files = [str(poolseq_path / file) for file in os.listdir(poolseq_path)]
+if config["popSet"] == "all":
+    input_sync_files += [str(other_path / file) for file in os.listdir(other_path)]
+
+rule all:
+    input: 
+        expand("{wd}/dest.{popset}.{method}.{maf}.{mac}.{version}.ann.vcf.gz", \
+                wd=config["working_directory"], \
+                popset=config["popSet"], \
+                method=config["method"], \
+                maf=config["maf"], \
+                mac=config["mac"], \
+                version=config["version"])
+
+rule makeJobs:
+    output: expand("{wd}/poolSNP_jobs.csv", wd=config["working_directory"])
+    shell: "run_makeJobs.sh {config[working_directory]}"
+    
+rule setupConfigDependencies:
+    output: temp(expand("{popset}.{method}.{maf}.{mac}.{version}.conf.temp", \
+                 popset=config["popSet"], \
+                 method=config["method"], \
+                 maf=config["maf"], \
+                 mac=config["mac"], \
+                 version=config["version"]))
+    shell: "touch {output}"
+    
+rule runPoolSnp:
+    input:
+        job_file=expand("{wd}/poolSNP_jobs.csv", wd=config["working_directory"]),
+        config_file=expand("{popset}.{method}.{maf}.{mac}.{version}.conf.temp", \
+                 popset=config["popSet"], \
+                 method=config["method"], \
+                 maf=config["maf"], \
+                 mac=config["mac"], \
+                 version=config["version"]),
+        input_files=input_sync_files
+    output:
+        "{config['working_directory']}/sub_vcfs/{jobid}.{popset}.{method}.{maf}.{mac}.{version}.vcf.gz"
+                 
+#        expand("{wd}/sub_vcfs/{jobid}.{popset}.{method}.{maf}.{mac}.{version}.vcf.gz", #wd=config["working_directory"], \
+#                 popset=config["popSet"], \
+#                 method=config["method"], \
+#                 maf=config["maf"], \
+#                 mac=config["mac"], \
+#                 version=config["version"])
+    resources:
+        array_size=len(open(f"{config['working_directory']}/poolSNP_jobs.csv").readlines())
+    shell : "run_poolsnp.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {input.jobfile} {config[script_directory]} {config[working_directory]} {config[other_sync_directory]} {config[poolseq_sync_directory]}"
+        
+rule gatherPoolSnp:
+    input:
+        "{config['working_directory']}/sub_vcfs/{jobid}.{popSet}.{method}.{maf}.{mac}.{version}.vcf.gz"
+#        expand("{wd}/sub_vcfs/{jobid}.{popSet}.{method}.{maf}.{mac}.{version}.vcf.gz", wd=config["working_directory"])
+    output:
+        expand("{wd}/sub_bcf/dest.{chr}.{popset}.{method}.{maf}.{mac}.{version}.bcf", wd=config['working_directory'], chr=CHRS,
+        popset=config["popSet"], \
+                method=config["method"], \
+                maf=config["maf"], \
+                mac=config["mac"], \
+                version=config["version"])
+#        "{config['working_directory']}/sub_bcf/dest.{chr}.{popSet}.{method}.{maf}.{mac}.{version}.bcf"
+#        expand("{wd}/sub_bcf/dest.{chr}.{popSet}.{method}.{maf}.{mac}.{version}.bcf", wd=config["working_directory"])
+    resources:
+        ntasks_per_node=20, array_size=8, time_limit=240
+    shell:  "run_poolsnp.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]}"
+        
+rule annotate:
+    input:
+        expand("{wd}/sub_bcf/dest.{chr}.{popset}.{method}.{maf}.{mac}.{version}.bcf", wd=config['working_directory'], chr=CHRS,
+        popset=config["popSet"], \
+                method=config["method"], \
+                maf=config["maf"], \
+                mac=config["mac"], \
+                version=config["version"])
+#        expand("{wd}/sub_bcf/dest.{chr}.{popSet}.{method}.{maf}.{mac}.{version}.bcf", wd=config["working_directory"])
+    output:
+        expand("{wd}/dest.{popset}.{method}.{maf}.{mac}.{version}.ann.vcf.gz", \
+                wd=config["working_directory"], \
+                popset=config["popSet"], \
+                method=config["method"], \
+                maf=config["maf"], \
+                mac=config["mac"], \
+                version=config["version"])
+#        "{config['working_directory']}/dest.{popSet}.{method}.{maf}.{mac}.{version}.ann.vcf.gz"
+#        expand("{wd}/dest.{popSet}.{method}.{maf}.{mac}.{version}.ann.vcf.gz", wd=config["working_directory"])
+    resources:
+        ntasks_per_node=10, time_limit=1440, memory_limit=20
+    shell:  "annotate.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]}"
+        
