@@ -13,8 +13,9 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
   maf=${3}
   mac=${4}
   version=${5}
-  jobs=${6}
-#   job=$( echo $jobid | sed 's/_/,/g')
+#   jobs=${6}
+  jobid=${6}
+  job=$( echo $jobid | sed 's/_/,/g')
   script_dir=${7}
 
 ## working & temp directory
@@ -42,16 +43,17 @@ echo "$(ls $wd)"
   fi
   
 ## get job
-  job=$( cat ${wd}/${jobs} | sed "${SLURM_ARRAY_TASK_ID}q;d" )
-  jobid=$( echo ${job} | sed 's/,/_/g' )
+#   job=$( cat ${wd}/${jobs} | sed "${SLURM_ARRAY_TASK_ID}q;d" )
+#   jobid=$( echo ${job} | sed 's/,/_/g' )
   echo $job
 
 ## set up RAM disk
   [ ! -d /dev/shm/$USER/ ] && mkdir /dev/shm/$USER/
   [ ! -d /dev/shm/$USER/${SLURM_JOB_ID} ] && mkdir /dev/shm/$USER/${SLURM_JOB_ID}
-  [ ! -d /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID} ] && mkdir /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
+#   [ ! -d /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID} ] && mkdir /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
 
-  tmpdir=/dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
+#   tmpdir=/dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
+  tmpdir=/dev/shm/$USER/${SLURM_JOB_ID}
 
 echo "Temp dir is $tmpdir"
 
@@ -90,8 +92,7 @@ echo "Temp dir is $tmpdir"
 ### paste function
   echo "paste"
   Rscript --no-save --no-restore ${script_dir}/paste.R ${job} ${tmpdir} ${method}
-cat ${tmpdir}/allpops.${method}.names 
-cat ${tmpdir}/allpops.${method}.sites 
+
 ### run through PoolSNP
   echo "poolsnp"
 
@@ -110,7 +111,6 @@ cat ${tmpdir}/allpops.${method}.sites
 
   elif [[ "${method}"=="PoolSNP" ]]; then
     echo $method
-    echo "$jobid: the sites file has $(wc -l ${tmpdir}/allpops.${method}.sites) lines"
 
     cat ${tmpdir}/allpops.${method}.sites | python ${script_dir}/PoolSnp.py \
     --sync - \
@@ -121,8 +121,6 @@ cat ${tmpdir}/allpops.${method}.sites
     --miss-frac 0.5 \
     --names $( cat ${tmpdir}/allpops.${method}.names |  tr '\n' ',' | sed 's/,$//g' )  > ${tmpdir}/${jobid}.${popSet}.${method}.${maf}.${mac}.${version}.vcf
   fi
-
-echo "${tmpdir}/${jobid}.${popSet}.${method}.${maf}.${mac}.${version}.vcf has lines $(wc -l ${tmpdir}/${jobid}.${popSet}.${method}.${maf}.${mac}.${version}.vcf)"
 
 ### compress and clean up
   echo "compress and clean"
