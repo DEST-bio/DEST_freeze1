@@ -1,10 +1,12 @@
-script_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling
-working_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test
-poolseq_sync_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/data/pipeline_output
-other_sync_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/data/
-popSet: all
-method: PoolSNP
-maf: "001"
-mac: 50
+script_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling #Location of the snpCalling scripts (from git repo)
+working_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test #Directory where all the data will be processed and where output will be written
+poolseq_sync_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/data/pipeline_output #Directory holding the masked SYNC files from the main pipeline output
+other_sync_directory: /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/data/ #Directory holding the other masked SYNC files
+popSet: all #Population to use: "all" or "PoolSeq"
+method: PoolSNP #Method to use for variant calling: "PoolSNP" or "SNAPE"
+maf: "001" #Minimum allele frequency (only used with PoolSNP method)
+mac: 50 #Minmum allele count (only used with PoolSNP method)
 version: 24Apr2021
-poolsnp_jobs: 999
+poolsnp_jobs: 999 #Number of jobs to break the run_poolsnp.sh step into
+
+snpEff_path: ~/snpEff #Where to find the .jar for snpEff and the config file to use

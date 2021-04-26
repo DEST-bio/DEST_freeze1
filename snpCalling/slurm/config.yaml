@@ -1,3 +1,3 @@
 jobs: 100
-cluster: "sbatch --account berglandlab -p standard -o /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/logs/{rule}.%A_%a.out -e /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/logs/{rule}.%A_%a.err -J {rule} --ntasks-per-node={resources.ntasks_per_node} -N 1 -t {resources.time_limit} --mem {resources.memory_limit}G"
+cluster: "sbatch --account berglandlab -p standard -o /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/logs/{rule}.%A.out -e /scratch/jho5ze/DEST_snakemake/DEST_freeze1/snpCalling/test/logs/{rule}.%A.err -J {rule} --ntasks-per-node={resources.ntasks_per_node} -N 1 -t {resources.time_limit} --mem {resources.memory_limit}G"
 default-resources: [ntasks_per_node=1, memory_limit=10, time_limit=120]

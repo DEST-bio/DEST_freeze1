@@ -3,9 +3,6 @@
 module purge
 module load gcc/7.1.0  openmpi/3.1.4
 module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3.6.3 python/3.6.6 vcftools/0.1.16
-#module spider python/3.7.7
-
-# set -e
 
 ## Run params
   popSet=${1}
@@ -24,9 +21,6 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
     if [ ! -d $outdir ]; then
         mkdir $outdir
     fi
-
-echo "Should have made sub_vcfs in below"
-echo "$(ls $wd)"
 
 ## get list of SNYC files based on popSet & method
 ### full list
@@ -50,9 +44,6 @@ echo "$(ls $wd)"
 ## set up RAM disk
   [ ! -d /dev/shm/$USER/ ] && mkdir /dev/shm/$USER/
   [ ! -d /dev/shm/$USER/${SLURM_JOB_ID} ] && mkdir /dev/shm/$USER/${SLURM_JOB_ID}
-#   [ ! -d /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID} ] && mkdir /dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
-
-#   tmpdir=/dev/shm/$USER/${SLURM_JOB_ID}/${SLURM_ARRAY_TASK_ID}
   tmpdir=/dev/shm/$USER/${SLURM_JOB_ID}
 
 echo "Temp dir is $tmpdir"

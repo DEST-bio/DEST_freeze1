@@ -11,6 +11,9 @@ maf=${3}
 mac=${4}
 version=${5}
 wd=${6}
+snpEffPath=${7}
+
+cd ${wd}
 
 echo "index"
   bcftools index -f ${wd}/sub_bcf/dest.2L.${popSet}.${method}.${maf}.${mac}.${version}.bcf
@@ -20,6 +23,7 @@ echo "index"
   bcftools index -f ${wd}/sub_bcf/dest.X.${popSet}.${method}.${maf}.${mac}.${version}.bcf
   bcftools index -f ${wd}/sub_bcf/dest.Y.${popSet}.${method}.${maf}.${mac}.${version}.bcf
   bcftools index -f ${wd}/sub_bcf/dest.4.${popSet}.${method}.${maf}.${mac}.${version}.bcf
+  bcftools index -f ${wd}/sub_bcf/dest.mitochondrion_genome.${popSet}.${method}.${maf}.${mac}.${version}.bcf
 
 
 echo "concat"
@@ -27,12 +31,11 @@ echo "concat"
   ${wd}/sub_bcf/dest.*.${popSet}.${method}.${maf}.${mac}.${version}.bcf \
   -o ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.bcf
 
-
 echo "convert to vcf & annotate"
   bcftools view \
   --threads 10 \
   ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.bcf | \
-  java -jar ~/snpEff/snpEff.jar \
+  java -jar ${snpEffPath}/snpEff.jar \
   eff \
   BDGP6.86 - > \
   ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.ann.vcf

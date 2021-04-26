@@ -10,10 +10,7 @@ maf=${3}
 mac=${4}
 version=${5}
 wd=${6}
-outdir=$wd/sub_vcfs
 chr=${7}
-
-# chr=$( cat ${wd}/poolSNP_jobs.csv | cut -f1 -d',' | sort | uniq | sed "${SLURM_ARRAY_TASK_ID}q;d" )
 
 echo "Chromosome: $chr"
 
@@ -22,15 +19,10 @@ if [ ! -d $bcf_outdir ]; then
     mkdir $bcf_outdir
 fi
 
-echo "grabbing from ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz"
-echo "ls output: $(ls ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz)"
+outdir=sub_vcfs
+cd ${wd}
 
-echo
-echo "Command: ls -d ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz | sort -t"_" -k2,2 -k3g,3  | \
-grep /${chr}_"
-echo ""
-
-ls -d ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz | sort -t"_" -k2,2 -k3g,3  | \
+ls -d ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz | sort -t"_" -k2,2 -k4g,4  | \
 grep /${chr}_ > $outdir/vcfs_order.${chr}.${popSet}.${method}.${maf}.${mac}.${version}.sort
 
 echo "Concatenating"

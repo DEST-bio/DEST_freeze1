@@ -81,4 +81,4 @@ rule annotate:
         expand("{wd}/dest.{{popset}}.{{method}}.{{maf}}.{{mac}}.{{version}}.ann.vcf.gz", wd=config["working_directory"])
     resources:
         ntasks_per_node=10, time_limit=1440, memory_limit=20
-    shell:  "bash annotate.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]}"
+    shell:  "bash annotate.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]} {config[snpEff_path]}"
