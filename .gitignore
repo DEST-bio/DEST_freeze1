@@ -1,1 +1,4 @@
 .DS_Store
+snpCalling/test
+snpCalling/.ipynb_checkpoints
+snpCalling/.snakemake
