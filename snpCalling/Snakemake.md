@@ -1,10 +1,37 @@
-Ensure that the BDGP6.86 is installed.
-If not run 
-```bash
-java -jar snpEff.jar download -v BDGP6.86
-```
+### Running the Pipeline with Snakemake
 
-First run to do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc.
+#### Description
+
+This is a short walkthrough to generate annotated VCF files from previously generated masked SYNC files with the scripts at [DEST_freeze1/mappingPipeline](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline). 
+
+> **_NOTE:_** Refer to the main [README.md](https://github.com/DEST-bio/DEST_freeze1/blob/snakemake/snpCalling/README.md) for a more complete description of the pipeline.
+
+#### Dependencies
+ * SLURM based cluster
+ * Snakemake (tested with version 6.1.1, pip installable)
+ * snpEff (tested with version 4.3t)
+ * Modules (loaded on the cluster)
+   * htslib, bcftools, parallel, intel/18.0, intelmpi/18.0, mvapich2/2.3.1, R/3.6.3, python/3.6.6, vcftools/0.1.1, gcc/7.1.0 , openmpi/3.1.4
+   
+#### Setup
+The config file `slurm/config.yaml` defines the cluster specific snakemake profile. It tells snakemake how to interact with SLURM to schedule jobs and correctly allocate resources. The `cluster` field defines the default command to submit a job and should be changed to fit your available allocations/partitions and any other resource limits or preferences.
+
+The config file `workflow.yaml` holds other pipeline parameters which should be changed to fit your needs:
+ * `script_directory`: Where the `snpCalling` scripts are located. Should be the path to this directory (`DEST_freeze1/snpCalling`) wherever you have cloned this repo.
+ * `working_directory`: Directory where all the data will be processed and where output will be written
+ * `poolseq_sync_directory`: Directory holding the masked SYNC files from the main pipeline output. They should all have the common suffix `*masked.sync.gz`
+ * `other_sync_directory`: Directory holding the other masked SYNC files. Again, should have the common suffix `*masked.sync.gz`
+ * `popSet`: Population to use: either `all` or `PoolSeq`. `all` uses both paths listed above to find masked SYNC files. `PoolSeq` only uses `poolseq_sync_directory`
+ * `method`: Method to use for variant calling: `PoolSNP` or `SNAPE`
+ * `maf`: Minimum allele frequency (only used with `PoolSNP` method)
+ * `mac`: Minmum allele count (only used with `PoolSNP` method)
+ * `version`: Name for the run (e.g. the date).
+ * `poolsnp_jobs`: umber of jobs to break the `run_poolsnp.sh` step into
+ * `snpEff_path`: Where to find the .jar for snpEff
+ 
+#### Running
+
+First, do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc. From `DEST_freeze1/snpCalling`, run
 ```bash
 snakemake --profile slurm -n
 ```
@@ -13,3 +40,5 @@ Then, if everything looks OK, run:
 ```bash
 snakemake --profile slurm
 ```
+
+That's it! This will run through Parts 1 & 2 from the main [README.md](https://github.com/DEST-bio/DEST_freeze1/blob/snakemake/snpCalling/README.md) to generate the annotated vcf file at `working_directory/dest.<popSet>.<method>.<maf>.<mac>.<version>.ann.vcf.gz`. 
