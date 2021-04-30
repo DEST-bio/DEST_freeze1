@@ -2,11 +2,11 @@
 
 ## Description
 
-This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline. 
+This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline.
 
-This script is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps. On the other hand, those using the data set on new data may start the pipeline at a different point depending if the data is to be downloaded from the SRA archive or if it exist locally in the user's cluster. 
+This script is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps. On the other hand, those using the data set on new data may start the pipeline at a different point depending if the data is to be downloaded from the SRA archive or if it exist locally in the user's cluster.
 
-Please be advised that this script assumes that the user will run the program on a cluster computer as it takes advantage of array jobs. Nevertheless, the script can be modified to run on a different configuration. 
+Please be advised that this script assumes that the user will run the program on a cluster computer as it takes advantage of array jobs. Nevertheless, the script can be modified to run on a different configuration.
 
 ## Before we start: Download the DEST pipeline
 ### Define working directory
@@ -17,7 +17,7 @@ Prior to running this script, or any other in this pipeline for that matter, we 
 wd=./DEST_example
 ```
 
-### Clone our git repo
+### Clone  git repo
 
 ```bash
 cd ${wd}
@@ -54,12 +54,12 @@ If the data exist locally, i.e. pair-end reads, you must ensure that the file na
 It is a good idea to rename your files to rename your files using this uniform convention
 ```bash
 #For example
-mv .../myfile.F.some_name.fastq.gz ./ID_1.fastq.gz 
-mv .../myfile.R.some_name.fastq.gz ./ID_2.fastq.gz 
+mv .../myfile.F.some_name.fastq.gz ./ID_1.fastq.gz
+mv .../myfile.R.some_name.fastq.gz ./ID_2.fastq.gz
 #Where "ID" is some identifier which makes sense to the user...
 ```
 ## Check that data are in the correct FASTQ format
-Double check that all downloaded data are in Fastq33. Uses script from [here](https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py). </br> This script has 2 inputs: the location of the repo and the place where the reads are stored 
+Double check that all downloaded data are in Fastq33. Uses script from [here](https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py). </br> This script has 2 inputs: the location of the repo and the place where the reads are stored
 
 ```bash
 sbatch ${wd}/DEST_freeze1/mappingPipeline/scripts/check_fastq_encoding.sh \
@@ -109,7 +109,7 @@ Our code has 2 parts. The first part "Get Sample information" leverages the arra
   pop=$( cat $4  | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f1 -d',' )
   srx=$( cat $4 | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
   numFlies=$( cat $4  | sed '1d' | cut -f1,12 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
-  
+
 ```
 The second part of the script executes the Docker image.  This script uses the reads in the format  "${srx}_1.fastq.gz". Here is an example of three of the core options:
 
@@ -118,7 +118,7 @@ The second part of the script executes the Docker image.  This script uses the r
 * **dont-prep:** This option is off by default. However, when this option is declared, the pipeline only runs partially and does not map reads. Instead, the program starts from the bam file stage.
 
 Please see all the options available [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/fq_to_sync_pipeline.sh).</br>
- 
+
 ```bash
 # This is an example. Do not Run
 ###################################
@@ -139,8 +139,8 @@ Please see all the options available [here](https://github.com/DEST-bio/DEST_fre
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
-  --do-snape 
-  
+  --do-snape
+
 ```
 ## Running the singularity container across list of populations
 Finally, the user can run the pipeline on their data using the following array job:
@@ -154,5 +154,3 @@ ${wd}/DEST_freeze1/populationInfo/samps.csv
 ```
 
 After this step has been completed, you are ready to move to the second step of the pipeline. "SNP calling, VCF and GDS generation"
-
-

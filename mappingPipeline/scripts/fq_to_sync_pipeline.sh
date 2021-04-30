@@ -264,7 +264,7 @@ if [ $do_poolsnp -eq "1" ]; then
   -f /opt/hologenome/raw/D_melanogaster_r6.12.fasta > $output/$sample/${sample}.mel_mpileup.txt
 
 
-  python3 /opt/DEST/mappingPipeline/scripts/Mpileup2Sync.py \
+  python3 /opt/DEST_freeze1/mappingPipeline/scripts/Mpileup2Sync.py \
   --mpileup $output/$sample/${sample}.mel_mpileup.txt \
   --ref /opt/hologenome/raw/D_melanogaster_r6.12.fasta.pickled.ref \
   --output $output/$sample/${sample} \
@@ -275,14 +275,14 @@ if [ $do_poolsnp -eq "1" ]; then
   check_exit_status "Mpileup2Sync" $?
 
   #For the PoolSNP output
-  python3 /opt/DEST/mappingPipeline/scripts/MaskSYNC_snape_complete.py \
+  python3 /opt/DEST_freeze1/mappingPipeline/scripts/MaskSYNC_snape_complete.py \
   --sync $output/$sample/${sample}.sync.gz \
   --output $output/$sample/${sample} \
   --indel $output/$sample/${sample}.indel \
   --coverage $output/$sample/${sample}.cov \
   --mincov $min_cov \
   --maxcov $max_cov \
-  --te /opt/DEST/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
+  --te /opt/DEST_freeze1/mappingPipeline/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
   --maxsnape $maxsnape
 
   check_exit_status "MaskSYNC" $?
@@ -341,7 +341,7 @@ if [ $do_snape -eq "1" ]; then
   --coverage $output/$sample/${sample}.cov \
   --mincov $min_cov \
   --maxcov $max_cov \
-  --te /opt/DEST/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
+  --te /opt/DEST_freeze1/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
   --maxsnape $maxsnape \
   --SNAPE
 
@@ -356,7 +356,7 @@ if [ $do_snape -eq "1" ]; then
   --coverage $output/$sample/${sample}.cov \
   --mincov $min_cov \
   --maxcov $max_cov \
-  --te /opt/DEST/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
+  --te /opt/DEST_freeze1/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
   --maxsnape $maxsnape \
   --SNAPE
 
