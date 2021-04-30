@@ -288,7 +288,20 @@
 			### sample type
 				table(samps$sampleType)
 
-	### worldclim data
+
+	### load inversions
+		inv <- fread("./DEST_freeze1/populationInfo/Inversions/inversion.af")
+		setnames(inv, "Sample", "sampleId")
+		samps <- merge(samps, inv, by="sampleId")
+		dim(samps)
+
+	### load sample filter
+		filter <- fread("./DEST_freeze1/populationInfo/sampleFilter/classify_pops.txt")
+		setnames(filter, c("POP", "Status"), c("sampleId", "status"))
+		samps <- merge(samps, filter, by="sampleId")
+		dim(samps)
+
+	### combine samps & worldclim
 		# first load WC bio variables at the resolution of 2.5 deg
 			biod <- getData("worldclim", var="bio", res=2.5)
 			tmind <- getData("worldclim", var="tmin", res=2.5)
@@ -303,25 +316,35 @@
 			precd<-extract(precd, samps[,c("long", "lat"), with=F])
 			​
 		# create a full dataset
-			bio.data <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
+			worldclim <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
 		​
-		# save into external file
-			write.csv(bio.data, file="./DEST_freeze1/populationInfo/dest.worldclim.csv", row.names=FALSE)
-		​
-		​
-	### save
-		setnames(samps, "Model", "SeqPlatform")
-		write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
+		# merge
+			samps <- merge(samps, worldclim, by="sampleId", all.x=T)
 
 
-	### combine samps & worldclim
-		library(data.table)
-		setwd("/scratch/aob2x/dest")
-		samps <- fread("./DEST_freeze1/populationInfo/samps.csv")
-		worldclim <- fread(file="./DEST_freeze1/populationInfo/dest.worldclim.csv")
 
-		sw <- merge(samps, worldclim, by="sampleId", all.x=T)
-		write.csv(sw, "./DEST_freeze1/populationInfo/samps_worldclim.csv", quote=F, row.names=F)
+		write.csv(samps, "./DEST_freeze1/populationInfo/samps_worldclim.csv", quote=F, row.names=F)
+
+
+
+
+
+		### save
+			setnames(samps, "Model", "SeqPlatform")
+			write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	### quick summary

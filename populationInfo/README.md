@@ -9,7 +9,7 @@
   > 2. `DEST_freeze1/populationInfo/dest.worldclim.csv` contains WorldClim data for sampling localities
 
 ## Library sequencing statistics
-  > `DEST_freeze1/populationInfo/sequencingSummaryStats.R` generates generates data that is part of Figure 3 and is found in Supplemental Table 2 <br>
+  > `DEST_freeze1/populationInfo/sequencingStats/sequencingSummaryStats.R` generates generates data that is part of Figure 3 and is found in Supplemental Table 2 <br>
   > 1. `DEST_freeze1/populationInfo/sequencingStats/rd.csv` Average read depth
   > 2. `DEST_freeze1/populationInfo/sequencingStats/pcr.csv` PCR duplicate rate
   > 3. `DEST_freeze1/populationInfo/sequencingStats/simulans.csv` D. simulans contamination rate
