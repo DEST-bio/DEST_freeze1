@@ -22,6 +22,29 @@
 ### set working directory
 	setwd("/scratch/aob2x/dest")
 
+### double check continent
+	coords2continent = function(points) {
+		# points <- matrix(c(30.77, 46.44), nrow=1)
+
+		### thanks Andy! https://stackoverflow.com/questions/21708488/get-country-and-continent-from-longitude-and-latitude-point-in-r/21727515
+		countriesSP <- getMap(resolution='low')
+		#countriesSP <- getMap(resolution='high') #you could use high res map from rworldxtra if you were concerned about detail
+
+		# converting points to a SpatialPoints object
+		# setting CRS directly to that from rworldmap
+		pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))
+
+
+		# use 'over' to get indices of the Polygons object containing each point
+		indices = over(pointsSP, countriesSP)
+
+		#indices$continent   # returns the continent (6 continent model)
+		indices$REGION   # returns the continent (7 continent model)
+		#indices$ADMIN  #returns country name
+		#indices$ISO3 # returns the ISO3 code
+	}
+
+
 ### this section loads in the disparate meta-data files and concatenates them.
 	### load in DrosEU data
 		#dat.drosEU <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/DrosEU_allYears_180607_ki.xlsx")
@@ -38,6 +61,8 @@
 		dat.drosEU.dt[,type:="pooled"]
 		#dat.drosEU.dt[,collectionDate := as.POSIXct(collectionDate)]
 		dat.drosEU.dt[,continent:="Europe"]
+		dat.drosEU.dt[,country:="Guadeloupe", continent:="North America"]
+
 		dat.drosEU.dt[,set:="DrosEU"]
 		dat.drosEU.dt[,nFlies:=as.numeric(as.character(nAutosomes))/2]
 		dat.drosEU.dt[,nAutosomes:=NULL]
@@ -176,24 +201,6 @@
 								 data.table(sampleId="SIM", sequenceId="SIM", country="w501", city="w501", collectionDate=NA, lat=NA, long=NA, n=1, season=NA, locality="w501", set="dgn", Data.Group="SIMULANS", Genome.Type="inbred_line", dgn_set="SIMULANS/SIM"), fill=T)
 
 		### get continents
-			coords2continent = function(points) {
-				### thanks Andy! https://stackoverflow.com/questions/21708488/get-country-and-continent-from-longitude-and-latitude-point-in-r/21727515
-				countriesSP <- getMap(resolution='low')
-				#countriesSP <- getMap(resolution='high') #you could use high res map from rworldxtra if you were concerned about detail
-
-				# converting points to a SpatialPoints object
-				# setting CRS directly to that from rworldmap
-				pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))
-
-
-				# use 'over' to get indices of the Polygons object containing each point
-				indices = over(pointsSP, countriesSP)
-
-				#indices$continent   # returns the continent (6 continent model)
-				indices$REGION   # returns the continent (7 continent model)
-				#indices$ADMIN  #returns country name
-				#indices$ISO3 # returns the ISO3 code
-			}
 
 			dat.dpgp.dt[,lat:=as.numeric(as.character(lat))]
 			dat.dpgp.dt[,long:=as.numeric(as.character(long))]
