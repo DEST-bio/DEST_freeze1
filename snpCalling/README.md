@@ -1,152 +1,44 @@
-# Scripts to call SNPs and generate VCF and GDS working files
+### Running the Pipeline with Snakemake
 
-## Description
+#### Description
 
-This set of scripts provides a pipeline to combine all the outputs from our first pipeline "1.Mapping" in order to call SNPs and subsequently generate working VCF and GDS files. It is important to highlights that our scripts can be used to call SNPs for both our sub-pipelines: the PoolSNP sub-pipeline and the SNAPE-pooled sub-pipeline. 
+This is a short walkthrough to generate annotated VCF files from previously generated masked SYNC files with the scripts at [DEST_freeze1/mappingPipeline](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline). 
 
-This script is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps including those from the precious pipeline. On the other hand, those using the data set on new data may need to modify the code at certain steps.
+> **_NOTE:_** Refer to the main [README.md](https://github.com/DEST-bio/DEST_freeze1/blob/snakemake/snpCalling/README.md) for a more complete description of the pipeline.
 
-As before, be advised that this script assumes that the user will run the program on a cluster computer as it takes advantage of array jobs. Nevertheless, the script can be modified to run on a different configuration. 
+#### Dependencies
+ * SLURM based cluster
+ * Snakemake (tested with version 6.1.1, pip installable)
+ * snpEff (tested with version 4.3t)
+ * Modules (loaded on the cluster)
+   * htslib, bcftools, parallel, intel/18.0, intelmpi/18.0, mvapich2/2.3.1, R/3.6.3, python/3.6.6, vcftools/0.1.1, gcc/7.1.0 , openmpi/3.1.4
+   
+#### Setup
+The config file `slurm/config.yaml` defines the cluster specific snakemake profile. It tells snakemake how to interact with SLURM to schedule jobs and correctly allocate resources. The `cluster` field defines the default command to submit a job and should be changed to fit your available allocations/partitions and any other resource limits or preferences.
 
+The config file `workflow.yaml` holds other pipeline parameters which should be changed to fit your needs:
+ * `script_directory`: Where the `snpCalling` scripts are located. Should be the path to this directory (`DEST_freeze1/snpCalling`) wherever you have cloned this repo.
+ * `working_directory`: Directory where all the data will be processed and where output will be written
+ * `poolseq_sync_directory`: Directory holding the masked SYNC files from the main pipeline output. They should all have the common suffix `*masked.sync.gz`
+ * `other_sync_directory`: Directory holding the other masked SYNC files. Again, should have the common suffix `*masked.sync.gz`
+ * `popSet`: Population to use: either `all` or `PoolSeq`. `all` uses both paths listed above to find masked SYNC files. `PoolSeq` only uses `poolseq_sync_directory`
+ * `method`: Method to use for variant calling: `PoolSNP` or `SNAPE`
+ * `maf`: Minimum allele frequency (only used with `PoolSNP` method)
+ * `mac`: Minmum allele count (only used with `PoolSNP` method)
+ * `version`: Name for the run (e.g. the date).
+ * `poolsnp_jobs`: umber of jobs to break the `run_poolsnp.sh` step into
+ * `snpEff_path`: Where to find the .jar for snpEff
+ 
+#### Running
 
-## Before we start: Download the DEST pipeline
-### Define working directory 
-
+First, do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc. From `DEST_freeze1/snpCalling`, run
 ```bash
-wd=./DEST_freeze1/snpCalling/
+snakemake --profile slurm -n
 ```
 
-## Define the fai file corresponding to the reference genome
-The file "holo_dmel_6.12.fa.fai" is the fai file generated from indexing the reference genome (in this case the holo-genome) we used to map reads. This is a file of small size which we will provide in the git repo, but can be generated using samtools.
-
+Then, if everything looks OK, run:
 ```bash
-fai=${wd}/holo_dmel_6.12.fa.fai
-```
-## Part 1. Generate a master "guide file" for jobs.
-This will help paralelize the pipeline, optimizing memory and time. This step requires the fai file as well as running R. Notice that our example shows a very idiosyncratic way to load R. This is probably only applicable to our super computer. Please modify accordingly
-
-```bash
-#Loading R in our cluster. Modify to your cluster
-module load intel/18.0 intelmpi/18.0
-module load goolf/7.1.0_3.1.4
-module load gdal proj R/4.0.0
-
-#Running the script
-Rscript makeJobs.R \
-${wd} \
-${fai}
+snakemake --profile slurm
 ```
 
-## Part 2a. Call SNP and Make files using the PoolSNP sub-pipeline
-
-**READ THIS EVEN IF YOU ARE ONLY RUNNING THE SNAPE SUBPIPE:** The following description applies to both subpipes, PoolSNP and SNAPE-pooled. At this point, we will call SNPs using the script "run_poolsnp.sh". 
-
-**How does this code work?** This code is designed to be run as an array job. This is accomplished by calling the code using sbatch with the --array flag. The size of this array can be determined using the size of the "poolSNP_jobs.csv" file generated in step 1. 
-
-The code takes in 6 arguments: The first paramter is the population set ('all' samples or just the 'PoolSeq' samples). Second parameter is the SNP calling method (PoolSNP or SNAPE). If method == PoolSNP, third parameter is MAF filter, fourth is MAC filter. These are retained for the SNAPE version as "NA" just to keep things consistent (see part 2d). The fifth paramenter is a user defined named which will be attached to all outputs. Lastly, the sixth paramenter is the master guide file, generated above.
-
-```bash
-sbatch --array=1-$( wc -l ${wd}/poolSNP_jobs.csv | cut -f1 -d' ' ) \
-${wd}/run_poolsnp.sh \
-all PoolSNP 001 50 10Mar2021 poolSNP_jobs.csv
-```
-
-Running the poolSNP sub-pipeline allows users to explore different paramenters, for example:
-
-```bash
-sbatch --array=1-$( wc -l ${wd}/poolSNP_jobs.csv | cut -f1 -d' ' ) \
-${wd}/run_poolsnp.sh \
-all PoolSNP 001 50 10Nov2020 poolSNP_jobs.csv
-
-sbatch --array=1-$( wc -l ${wd}/poolSNP_jobs.csv | cut -f1 -d' ' ) \
-${wd}/run_poolsnp.sh \
-PoolSeq PoolSNP 001 50 10Nov2020 poolSNP_jobs.csv
-```
-
-## Part 2b. Gather BCF outputs into a unified file
-
-This script collects all the individual bcf files generated above into a single file. The paramenters for this code are the same as above.
-
-```bash
-sbatch --array=1-8 \
-${wd}/gather_poolsnp.sh \
-all PoolSNP 001 50 10Nov2020
-```
-
-## Part 2c. Annotate and make final VCF
-
-This script takes the gathered VCF created in 2b and outputs a final VCF. Next, the script implements a program which annotates each SNP in the VCF. This script has a final step which also outputs a GDS file. This is optional, but we recommend this step to people interested in replicating out analyses. 
-
-```bash
-sbatch ${wd}/annotate.sh \
-all PoolSNP 001 50 10Nov2020
-```
-
-## Part 2d. Modify this code for running SNAPE-pooled. 
-
-Here is an example of the code modified for generating VCF/GDS for SNAPE. Notice that many of the parameters needed for PoolSNP are no longer applicable to SNAPE. So these parameters are set as "NA".
-
-```bash
-sbatch --array=1-$( wc -l ${wd}/poolSNP_jobs.csv | cut -f1 -d' ' ) \
-${wd}/run_poolsnp.sh \
-PoolSeq SNAPE NA NA 10Nov2020 poolSNP_jobs.csv
-
-sbatch --array=1-8 \
-${wd}/gather_poolsnp.sh \
-PoolSeq SNAPE NA NA 10Nov2020
-
-sbatch \
-${wd}/annotate.sh \
-PoolSeq SNAPE NA NA 10Nov2020
-```
-
-The VCF and GDS files generated at this point can be used to replicate the analyses shown in the paper. 
-
-## 3. [OPTIONAL] Parameter evaluation for PoolSNP (global MAC & MAF thresholds)
-
-For users interested in optimizing parameters for PoolSNP, we provide the following example code to evaluate core  PoolSNP parameters using a small subset of the data.
-
-### 3a. Random sample of ~10% of data:
-```bash
-  shuf -n 100 ${wd}/poolSNP_jobs.csv > ${wd}/poolSNP_jobs.sample.csv
-```
-
-### 3b. Run pool_snp
-```bash
-  module load parallel
-
-  runJob () {
-    wd="/scratch/aob2x/dest"
-    sbatch --array=1-$( wc -l ${wd}/poolSNP_jobs.sample.csv | cut -f1 -d' ' ) ${wd}/DEST/snpCalling/run_poolsnp.sh all PoolSNP ${1} ${2} paramTest poolSNP_jobs.sample.csv
-  }
-  export -f runJob
-
-  parallel -j 1 runJob ::: 001 01 05 ::: 5 10 15 20 50 100
-
-```
-
-### 3c. Run gather
-```bash
-  module load parallel
-
-  runJob () {
-    wd="/scratch/aob2x/dest"
-    sbatch --array=1-8 ${wd}/DEST/snpCalling/gather_poolsnp.sh all PoolSNP ${1} ${2} paramTest
-  }
-  export -f runJob
-
-  parallel -j 1 runJob ::: 001 01 05 ::: 5 10 15 20 50 100
-```
-
-### 3d. Run annotate
-```bash
-  module load parallel
-
-  runJob () {
-    wd="/scratch/aob2x/dest"
-    sbatch ${wd}/DEST/snpCalling/annotate.sh all PoolSNP ${1} ${2} paramTest
-  }
-  export -f runJob
-
-  parallel -j 1 runJob ::: 001 01 05 ::: 5 10 15 20 50 100
-```
+That's it! This will run through Parts 1 & 2 from the main [README.md](https://github.com/DEST-bio/DEST_freeze1/blob/snakemake/snpCalling/README.md) to generate the annotated vcf file at `working_directory/dest.<popSet>.<method>.<maf>.<mac>.<version>.ann.vcf.gz`. 
