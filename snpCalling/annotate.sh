@@ -1,17 +1,7 @@
 #!/usr/bin/env bash
-#
-#SBATCH -J annotate # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
-#SBATCH -N 1 # on one node
-#SBATCH -t 24:00:00 ### 6 hours
-#SBATCH --mem 20G
-#SBATCH -o /scratch/aob2x/dest/slurmOutput/split_and_run.%A_%a.out # Standard output
-#SBATCH -e /scratch/aob2x/dest/slurmOutput/split_and_run.%A_%a.err # Standard error
-#SBATCH -p standard
-#SBATCH --account berglandlab
 
+module purge
 
-# cat /scratch/aob2x/dest/slurmOutput/split_and_run.19037185_4.err
 module load htslib bcftools intel/18.0 intelmpi/18.0 parallel R/3.6.3
 
 
@@ -20,9 +10,10 @@ method=${2}
 maf=${3}
 mac=${4}
 version=${5}
-#maf=001; mac=100; popSet="all"; method="PoolSNP"; version="paramTest"
+wd=${6}
+snpEffPath=${7}
 
-wd=/scratch/aob2x/dest
+cd ${wd}
 
 echo "index"
   bcftools index -f ${wd}/sub_bcf/dest.2L.${popSet}.${method}.${maf}.${mac}.${version}.bcf
@@ -32,6 +23,7 @@ echo "index"
   bcftools index -f ${wd}/sub_bcf/dest.X.${popSet}.${method}.${maf}.${mac}.${version}.bcf
   bcftools index -f ${wd}/sub_bcf/dest.Y.${popSet}.${method}.${maf}.${mac}.${version}.bcf
   bcftools index -f ${wd}/sub_bcf/dest.4.${popSet}.${method}.${maf}.${mac}.${version}.bcf
+  bcftools index -f ${wd}/sub_bcf/dest.mitochondrion_genome.${popSet}.${method}.${maf}.${mac}.${version}.bcf
 
 
 echo "concat"
@@ -39,12 +31,11 @@ echo "concat"
   ${wd}/sub_bcf/dest.*.${popSet}.${method}.${maf}.${mac}.${version}.bcf \
   -o ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.bcf
 
-
 echo "convert to vcf & annotate"
   bcftools view \
   --threads 10 \
   ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.bcf | \
-  java -jar ~/snpEff/snpEff.jar \
+  java -jar ${snpEffPath}/snpEff.jar \
   eff \
   BDGP6.86 - > \
   ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.ann.vcf
@@ -66,3 +57,5 @@ echo "make GDS"
 echo "bgzip & tabix"
   bgzip -c ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.ann.vcf > ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.ann.vcf.gz
   tabix -p vcf ${wd}/dest.${popSet}.${method}.${maf}.${mac}.${version}.ann.vcf.gz
+
+rm ${wd}/tmp.header

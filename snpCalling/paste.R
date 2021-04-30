@@ -8,6 +8,7 @@ method=args[3]
 #job="2L_138316_276631"; tmpdir="/dev/shm/aob2x/1/2"; method="PoolSNP"
 job=gsub("mitochondrion_genome", "mitochondrionGenome", job)
 jobId=gsub(",", "_", job)
+jobId=gsub("mitochondrionGenome", "mitochondrion_genome", jobId)
 
 ### libraries
   library(data.table)
@@ -25,14 +26,20 @@ jobId=gsub(",", "_", job)
 
   setwd(tmpdir)
 
+  chrom_name = rev(tstrsplit(jobId, "_"))[[3]]
+  if (chrom_name == "genome") chrom_name = "mitochondrion_genome"
+
+  start = rev(tstrsplit(jobId, "_"))[[2]]
+  end = rev(tstrsplit(jobId, "_"))[[1]]
+
   #files <- files[-1]
 ### import
   o <- foreach(files.i=files, .errorhandling="pass")%do%{
     #files.i=files[10]
     tmp <- fread(files.i)
     if(dim(tmp)[1]==0) {
-      tmp <- data.table(V1=tstrsplit(jobId, "_")[[1]],
-                        V2=as.numeric(tstrsplit(jobId, "_")[[2]]):as.numeric(tstrsplit(jobId, "_")[[3]]),
+      tmp <- data.table(V1=chrom_name,
+                        V2=start:end,
                         V3="N",
                         V4=".:.:.:.:.:.")
     }

@@ -6,12 +6,14 @@
   library(foreach)
 
 ### define working directory where
-  wd="/project/berglandlab/DEST"
+  args = commandArgs(trailingOnly=TRUE)
+
+  wd=args[1]
 
 ### get chromosome names and lengths
   chrs="2L|2R|3L|3R|4|X|Y|mitochondrion_genome"
 
-  fai.file="/scratch/aob2x/dest/referenceGenome/r6/holo_dmel_6.12.fa.fai" ## path to hologenome 6.12
+  fai.file=paste(wd,"/holo_dmel_6.12.fa.fai", sep="") ## path to hologenome 6.12
   chrLen <- fread(fai.file)
 
   chrs.dt <- foreach(chr.i=tstrsplit(chrs, "\\|"), .combine="rbind")%do%{
@@ -20,7 +22,7 @@
   }
 
 ### split into how many jobs?
-  nJobs <- 999
+  nJobs <- strtoi(args[2])
 
 ### how many jobs per chr
   chrs.dt[,nJobs:=floor(maxLen/sum(chrs.dt$maxLen)*nJobs) + 1]
@@ -43,4 +45,4 @@
   }
 
 ### write job file
-  write.table(jobs, quote=F, col.names=F, row.names=F, sep=",", file="/scratch/aob2x/dest/poolSNP_jobs.csv")
+  write.table(jobs, quote=F, col.names=F, row.names=F, sep=",", file=paste(wd,"/poolSNP_jobs.csv", sep=""))
