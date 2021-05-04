@@ -248,14 +248,14 @@
 
 		### function to identify best station to use
 
-			getBestStation <- function(lat, long, year, threshold=2) {
+			getBestStation <- function(lat, long, minYear, maxYear, threshold=2) {
 				### i <- which(samps$sampleId=="PA_li_14_spring"); i<-180
 				### lat <- samps$lat[i]; long <- samps$long[i]; threshold=3; year=samps$year[i]
 
 				if(!is.na(lat)) {
 					stations[,d:=spDistsN1(pts=as.matrix(cbind(longitude, latitude)), pt=c(long, lat), longlat=T)]
 
-					stations.tmp <- stations[first_year<=year & last_year>=year][element%in%c("TMAX", "TMIN")][which.min(abs(d))]
+					stations.tmp <- stations[first_year<=minYear & last_year>=maxYear][element%in%c("TMAX", "TMIN")][which.min(abs(d))]
 
 					if(dim(stations.tmp)[1]==1) {
 						return(data.table(stationId=stations.tmp$id, dist_km=stations.tmp$d))
@@ -267,18 +267,21 @@
 				}
 			}
 
+			samps.ag <- samps[,list(minYear=min(year), maxYear=max(year), lat=mean(lat), long=mean(long)), list(locality)]
+
+
 			library(doMC)
 			registerDoMC(20)
-			o <- foreach(i=1:dim(samps)[1])%dopar%{
+			o <- foreach(i=1:dim(samps.ag)[1])%dopar%{
 				print(i)
-				getBestStation(lat=samps[i]$lat, long=samps[i]$long, year=samps[i]$year, threshold=4)
-
+				tmp <- getBestStation(lat=samps.ag[i]$lat, long=samps.ag[i]$long, minYear=samps.ag[i]$minYear, maxYear=samps.ag[i]$max, threshold=4)
+				tmp[,locality:=samps.ag[i]$locality]
 			}
 			o <- rbindlist(o)
 
-			samps <- cbind(samps, o)
+			samps <- merge(samps, o, by="locality", all.x=T)
 
-			### all of the collections (except DGRP & SIM have id)
+			### all of the collections (except SIM have id)
 				table(!is.na(samps$stationId))
 
 			### how far away are these stations? ~80% within 50km; ~95% within 100km
@@ -299,68 +302,49 @@
 	### load inversions
 		inv <- fread("./DEST_freeze1/populationInfo/Inversions/inversion.af")
 		setnames(inv, "Sample", "sampleId")
-		samps <- merge(samps, inv, by="sampleId")
+		samps <- merge(samps, inv, by="sampleId", all.x=T)
 		dim(samps)
 
 	### load sample filter
 		filter <- fread("./DEST_freeze1/populationInfo/sampleFilter/classify_pops.txt")
 		setnames(filter, c("POP", "Status"), c("sampleId", "status"))
-		samps <- merge(samps, filter, by="sampleId")
+		samps <- merge(samps, filter[,c("sampleId", "status"),with=F], by="sampleId", all.x=T)
+		samps[is.na(status), status:="Keep"]
 		dim(samps)
 
+
 	### combine samps & worldclim
-		# first load WC bio variables at the resolution of 2.5 deg
-			biod <- getData("worldclim", var="bio", res=2.5)
-			tmind <- getData("worldclim", var="tmin", res=2.5)
-			tmaxd <- getData("worldclim", var="tmax", res=2.5)
-			precd <- getData("worldclim", var="prec", res=2.5)
+		### this:
+			# first load WC bio variables at the resolution of 2.5 deg
+				biod <- getData("worldclim", var="bio", res=2.5)
+				tmind <- getData("worldclim", var="tmin", res=2.5)
+				tmaxd <- getData("worldclim", var="tmax", res=2.5)
+				precd <- getData("worldclim", var="prec", res=2.5)
+				​
 			​
-		​
-		# extact for each coordinate bio clim variables
-			bio<-extract(biod, samps[,c("long", "lat"), with=F])
-			tmin<-extract(tmind, samps[,c("long", "lat"), with=F])
-			tmax<-extract(tmaxd, samps[,c("long", "lat"), with=F])
-			precd<-extract(precd, samps[,c("long", "lat"), with=F])
-			​
-		# create a full dataset
-			worldclim <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
-		​
+			# extact for each coordinate bio clim variables
+				bio<-extract(biod, samps[,c("long", "lat"), with=F])
+				tmin<-extract(tmind, samps[,c("long", "lat"), with=F])
+				tmax<-extract(tmaxd, samps[,c("long", "lat"), with=F])
+				precd<-extract(precd, samps[,c("long", "lat"), with=F])
+				​
+			# create a full dataset
+				worldclim <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
+		# or this:
+				worldclim <- fread("./DEST_freeze1/populationInfo/worldClim/dest.worldclim.csv")
+
 		# merge
 			samps <- merge(samps, worldclim, by="sampleId", all.x=T)
 
+### add in simulans contamination rate
+	# samps <- fread("./DEST_freeze1/populationInfo/samps_30April2021.csv")
+	sim <- fread("./DEST_freeze1/populationInfo/sequencingStats/simulans.csv")
+	samps <- merge(samps, sim[auto==T], by="sampleId", all.x=T)
+	samps <- samps[,-"auto", with=F]
 
+### add in sex of flies (all pool-seq are male, all dgn are female)
+	samps[,sex:="male"]
+	samps[set=="dgn", sex:="female"]
 
-		write.csv(samps, "./DEST_freeze1/populationInfo/samps_worldclim.csv", quote=F, row.names=F)
-
-
-
-
-
-		### save
-			setnames(samps, "Model", "SeqPlatform")
-			write.csv(samps, "./DEST_freeze1/populationInfo/samps.csv", quote=F, row.names=F)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	### quick summary
-		samps <- fread("./DEST_freeze1/populationInfo/samps.csv")
-		samps.ag <- samps[,list(nSamps=length(locality),
-							nSpring=sum(season=="spring"),
-							nFall=sum(season=="fall"),
-							nTime=length(unique(collectionDate)),
-							maxDelta=max(yday) - min(yday),
-							lat.u=length(unique(round(lat, 1))),
-							long.u=length(unique(round(long, 1)))),
-					list(locality, continent, set)]
+### save
+	write.csv(samps, "./DEST_freeze1/populationInfo/samps_10Nov2020.csv", quote=F, row.names=F)

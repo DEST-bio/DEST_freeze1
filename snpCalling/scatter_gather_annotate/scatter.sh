@@ -10,7 +10,6 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
   maf=${3}
   mac=${4}
   version=${5}
-#   jobs=${6}
   jobid=${6}
   job=$( echo $jobid | sed 's/_/,/g')
   script_dir=${7}
@@ -26,7 +25,7 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
 ### full list
   syncPath1orig="${9}/*masked.sync.gz"
   syncPath2orig="${10}/*masked.sync.gz"
-  
+
 ### target pops
   if [[ "${popSet}" == "PoolSeq" ]]; then
     syncPath1=""
@@ -35,7 +34,7 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
     syncPath1=${syncPath1orig}
     syncPath2=${syncPath2orig}
   fi
-  
+
 ## get job
 #   job=$( cat ${wd}/${jobs} | sed "${SLURM_ARRAY_TASK_ID}q;d" )
 #   jobid=$( echo ${job} | sed 's/,/_/g' )
@@ -82,14 +81,14 @@ echo "Temp dir is $tmpdir"
 
 ### paste function
   echo "paste"
-  Rscript --no-save --no-restore ${script_dir}/paste.R ${job} ${tmpdir} ${method}
+  Rscript --no-save --no-restore ${script_dir}/scatter_gather_annotate/paste.R ${job} ${tmpdir} ${method}
 
-### run through PoolSNP
-  echo "poolsnp"
+### run through SNP calling
+  echo "SNP calling"
 
   if [[ "${method}" == "SNAPE" ]]; then
     echo $method
-    cat ${tmpdir}/allpops.${method}.sites | python ${script_dir}/PoolSnp.py \
+    cat ${tmpdir}/allpops.${method}.sites | python ${script_dir}/PoolSNP/PoolSnp.py \
     --sync - \
     --min-cov 4 \
     --max-cov 0.95 \
@@ -103,7 +102,7 @@ echo "Temp dir is $tmpdir"
   elif [[ "${method}"=="PoolSNP" ]]; then
     echo $method
 
-    cat ${tmpdir}/allpops.${method}.sites | python ${script_dir}/PoolSnp.py \
+    cat ${tmpdir}/allpops.${method}.sites | python ${script_dir}/PoolSNP/PoolSnp.py \
     --sync - \
     --min-cov 4 \
     --max-cov 0.95 \

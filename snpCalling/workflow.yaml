@@ -8,5 +8,4 @@ maf: "001" #Minimum allele frequency (only used with PoolSNP method)
 mac: 50 #Minmum allele count (only used with PoolSNP method)
 version: 24Apr2021
 poolsnp_jobs: 999 #Number of jobs to break the run_poolsnp.sh step into
-
 snpEff_path: ~/snpEff #Where to find the .jar for snpEff and the config file to use

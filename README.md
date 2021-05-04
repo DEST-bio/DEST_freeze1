@@ -13,4 +13,10 @@
   > `add_DGN_datda\`: Downloads, formats, lifts-over the Drosophila Genome Nexus data into gSYNC format
 
 ## SNP calling
-  > `snpCalling\`: SNP calling based on gSYNC files </br>
+  > `snpCalling\`: SNP calling based on gSYNC files. Runs PoolSNP and SNAPE using snakemake pipeline
+
+## Example Scripts
+  > `examples`: Provides a basic script to pull allele frequencies from a GDS table and also calculates the effective coverage
+
+## RepeatMasker
+  > 

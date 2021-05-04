@@ -3,7 +3,7 @@ from pathlib import Path
 from glob import glob
 import os
 
-configfile: "slurm/workflow.yaml"
+configfile: "workflow.yaml"
 
 CHRS=["2L", "2R", "3L", "3R", "4", "X", "Y", "mitochondrion_genome"]
 
@@ -52,13 +52,13 @@ rule all:
                 mac=config["mac"], \
                 version=config["version"])
 
-rule runPoolSnp:
+rule runSNP_calling:
     input:
         job_file=f"{config['working_directory']}/poolSNP_jobs.csv",
         input_files=input_sync_files
     output:
         expand("{wd}/sub_vcfs/{{jobid}}.{{popset}}.{{method}}.{{maf}}.{{mac}}.{{version}}.vcf.gz", wd=config['working_directory'])
-    shell : "bash run_poolsnp.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {wildcards.jobid} {config[script_directory]} {config[working_directory]} {config[other_sync_directory]} {config[poolseq_sync_directory]}"
+    shell : "bash scatter_gather_annotate/scatter.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {wildcards.jobid} {config[script_directory]} {config[working_directory]} {config[other_sync_directory]} {config[poolseq_sync_directory]}"
 
 def get_files_to_gather(wildcards):
     job_ids = open(job_file_path).readlines()
@@ -72,7 +72,7 @@ rule gatherPoolSnp:
         expand("{wd}/sub_bcf/dest.{{chr}}.{{popSet}}.{{method}}.{{maf}}.{{mac}}.{{version}}.bcf", wd=config['working_directory'])
     resources:
         ntasks_per_node=20, time_limit=240
-    shell:  "bash gather_poolsnp.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]} {wildcards.chr}"
+    shell:  "bash scatter_gather_annotate/gather.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]} {wildcards.chr}"
 
 rule annotate:
     input:
@@ -81,4 +81,4 @@ rule annotate:
         expand("{wd}/dest.{{popset}}.{{method}}.{{maf}}.{{mac}}.{{version}}.ann.vcf.gz", wd=config["working_directory"])
     resources:
         ntasks_per_node=10, time_limit=1440, memory_limit=20
-    shell:  "bash annotate.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]} {config[snpEff_path]}"
+    shell:  "bash scatter_gather_annotate/annotate.sh {config[popSet]} {config[method]} {config[maf]} {config[mac]} {config[version]} {config[working_directory]} {config[snpEff_path]}"
