@@ -17,6 +17,3 @@
 
 ## Example Scripts
   > `examples`: Provides a basic script to pull allele frequencies from a GDS table and also calculates the effective coverage
-
-## RepeatMasker
-  > 

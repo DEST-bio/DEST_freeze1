@@ -337,7 +337,6 @@
 			samps <- merge(samps, worldclim, by="sampleId", all.x=T)
 
 ### add in simulans contamination rate
-	# samps <- fread("./DEST_freeze1/populationInfo/samps_30April2021.csv")
 	sim <- fread("./DEST_freeze1/populationInfo/sequencingStats/simulans.csv")
 	samps <- merge(samps, sim[auto==T], by="sampleId", all.x=T)
 	samps <- samps[,-"auto", with=F]

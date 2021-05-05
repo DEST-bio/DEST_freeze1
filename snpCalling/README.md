@@ -44,4 +44,4 @@ snakemake --profile slurm
 ```
 
 #### Output files
-That's it! This will run through Parts 1 & 2 from the main [README.md](https://github.com/DEST-bio/DEST_freeze1/blob/snakemake/snpCalling/README.md) to generate the annotated VCF and GDS files at `working_directory/dest.<popSet>.<method>.<maf>.<mac>.<version>.ann.*`.
+VCF, BCF, and GDS files are output to `<working_directory>/dest.<popSet>.<method>.<maf>.<mac>.<version>.ann.*`.
