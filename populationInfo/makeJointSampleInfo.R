@@ -1,8 +1,6 @@
 ### Make joint popInfo file for DEST
 ### Final data has columsn: sampleId, country, city, collectionDate, lat, long, season, nFlies, locality, type (inbred/pooled), continent
 
-
-### ijob -c1 -p standard -A berglandlab
 ### module load intel/18.0 intelmpi/18.0 R/3.6.3; R
 
 
@@ -333,9 +331,10 @@
 				​
 			# create a full dataset
 				worldclim <- as.data.table(cbind(samps[,c("sampleId"), with=F],bio,tmin,tmax,precd))
+
 		# or this:
 				worldclim <- fread("./DEST_freeze1/populationInfo/worldClim/dest.worldclim.csv")
-
+				
 		# merge
 			samps <- merge(samps, worldclim, by="sampleId", all.x=T)
 
