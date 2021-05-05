@@ -81,6 +81,9 @@
 		### add in SRA accession numbers from separate file
 			drosEU.sra <- fread("./DEST_freeze1/populationInfo/OriginalMetadata/drosEU_SraRunInfo.csv")
 			setnames(drosEU.sra, c("LibraryName", "Run", "Experiment"), c("sampleId", "SRA_accession", "SRA_experiment"))
+			drosEU.sra[sampleId=="UA_Pir_14_26", sampleId:="UA_Pyr_14_26"]
+			drosEU.sra[sampleId=="UA_Pir_15_21", sampleId:="UA_Pyr_15_21"]
+			drosEU.sra[sampleId=="UA_Pyr_16_48", sampleId:="UA_Pir_16_48"]
 
 			dat.drosEU.dt <- merge(dat.drosEU.dt, drosEU.sra[,c("sampleId", "SRA_accession", "SRA_experiment", "Model"),with=F], by="sampleId", all=T)
 			dat.drosEU.dt <- dat.drosEU.dt[!is.na(set)]
