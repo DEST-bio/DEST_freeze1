@@ -80,12 +80,12 @@ If you are unfamiliar with the SLURM header. Read more [here](https://slurm.sche
 #SBATCH -J dockerMap # A single job name for the array
 #SBATCH -c 11
 #SBATCH -N 1 # on one node
-#SBATCH -t 72:00:00 
-#SBATCH --mem 90G #⇐ change depending on your resources
+#SBATCH -t 72:00:00 #<= this may depend on your resources
+#SBATCH --mem 90G #<= this may depend on your resources
 #SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
 #SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
-#SBATCH -p standard #⇐ you may want to change this
-#SBATCH --account jcbnunez #⇐ you may want to change this
+#SBATCH -p <your partition, if applicable>
+#SBATCH --account <your account name, if applicable>
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```
 Remember to update your options in the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). **If you are running this code for tutorial purposes, then the default options (shown below) is what you want!**
