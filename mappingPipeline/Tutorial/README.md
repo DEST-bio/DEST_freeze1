@@ -2,14 +2,14 @@
 
 The following script will guide the user through a example of the mapping pipeline described in our paper using a toy dataset.
 
-### Step 0. Define your working directory and  Download the DEST pipeline
+### Step 1. Define your working directory and  Download the DEST pipeline
 Throughout our example we will use ${wd} as the base directory. 
 ```{sh}
 wd=.
 git clone https://github.com/DEST-bio/DEST_freeze1.git
 ```
 
-### Step 1. Check that you have the toy dataset and metadata
+### Step 2. Check that you have the toy dataset and metadata
 The toy dataset is provided in this github. Make sure you find the reads in the git folder.
 Start by declaring this function:
 
@@ -58,19 +58,19 @@ gzip ToyReads_2.fastq
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ``` 
 
-### Step 2. Create a folder for the slurm output
+### Step 3. Create a folder for the slurm output
 Now  create a dump folder for all outputs. This is most relevant if running dest on a cluster. 
 ```{sh}
 mkdir ${wd}/slurmOutput
 ```
 
-### Step 3. Create the singularity image
+### Step 4. Create the singularity image
 Now lets build the docker image. **Skip this step if you have already built the image!**
 ```{sh}
 module load singularity
 singularity pull docker://destbiodocker/destbiodocker
 ```
-### Step 4. Personalize your pipeline options
+### Step 5. Personalize your pipeline options
 Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). The default header (shown below) is provided as an example, and will not work on your cluster. 
 If you are unfamiliar with the SLURM header. Read more [here](https://slurm.schedmd.com/documentation.html). 
 ```{sh}
@@ -114,7 +114,7 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
   #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```
 
-### Step 5. Run the mapping pipeline
+### Step 6. Run the mapping pipeline
 This step will run the tutorial pipeline. Notice that we are using tutorial-specific files. these tutorial only files are:
 
  * [Toy reads](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline/Tutorial)
