@@ -24,7 +24,7 @@ if not log_dir.exists():
 job_file_path = wd / "poolSNP_jobs.csv"
 if not job_file_path.exists():
     chr_lens = dict()
-    with open(config["script_directory"] + "/holo_dmel_6.12.fa.fai") as src:
+    with open(config["script_directory"] + "scatter_gather_annotate/holo_dmel_6.12.fa.fai") as src:
         for line in src.readlines():
             line = line.split()
             if line[0] in CHRS:
