@@ -4,7 +4,7 @@
 
 This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline.
 
-Please read this repo to learn about the various options of our pipeline. We recommend running through our [TUTORIAL](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline/Tutorial) before using this script on the entire dataset. The tutorial uses a small toy dataset and only takes ~10 minutes to run.
+Please read this repo to learn about the various options of our pipeline. We recommend running through our [TUTORIAL](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline/Tutorial) before using this script on the entire dataset. The tutorial uses a small toy dataset and only takes ~15-20 minutes to run.
 
 This repo is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps. On the other hand, those using the data set on new data may start the pipeline at a different point depending if the data is to be downloaded from the SRA archive or if it exist locally in the user's cluster.
 
@@ -162,7 +162,7 @@ The paramters for the docker pipeline are:
 ```
 
 ### The SLURM header must be modified to your cluster or machine
-Notice that our example scripts all use a YAML header that is unique to our supercomputer. **You will need to modify this for it to run in your machine!!**
+Notice that our example scripts all use an example SLURM header that is unique to our supercomputer. **You will need to modify this for it to run in your machine!!**
 
 ```{sh}
 #!/usr/bin/env bash
