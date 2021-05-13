@@ -71,7 +71,7 @@ module load singularity
 singularity pull docker://destbiodocker/destbiodocker
 ```
 ### Step 4. Personalize your pipeline options
-Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). Our current YAML header (shown below) will not work on your cluster. 
+Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). The default header (shown below) is provided as an example, and will not work on your cluster. 
 If you are unfamiliar with the SLURM header. Read more [here](https://slurm.schedmd.com/documentation.html). 
 ```{sh}
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
