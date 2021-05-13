@@ -170,12 +170,12 @@ Notice that our example scripts all use an example SLURM header that is unique t
 #SBATCH -J dockerMap # A single job name for the array
 #SBATCH -c 11
 #SBATCH -N 1 # on one node
-#SBATCH -t 72:00:00 
-#SBATCH --mem 90G
+#SBATCH -t 72:00:00 #<= this may depend on your resources
+#SBATCH --mem 90G #<= this may depend on your resources
 #SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
 #SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
-#SBATCH -p standard
-#SBATCH --account jcbnunez
+#SBATCH -p <your partition, if applicable>
+#SBATCH --account <your account name, if applicable>
 
 ```
 
