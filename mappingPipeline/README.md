@@ -159,7 +159,7 @@ The paramters for the docker pipeline are:
 
 ```
 
-### The YAML header must be modified to your cluster or machine
+### The SLURM header must be modified to your cluster or machine
 Notice that our example scripts all use a YAML header that is unique to our supercomputer. **You will need to modify this for it to run in your machine!!**
 
 ```{sh}
