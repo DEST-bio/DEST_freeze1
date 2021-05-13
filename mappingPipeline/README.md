@@ -80,7 +80,7 @@ singularity pull docker://destbiodocker/destbiodocker
 ```
 
 ## Pipeline options
-These are the details of the array job script [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh)</br>  which executes the mapping pipeline. This script can run the pipeline in its entirety (from Fastq to final file), or partially. As such, it requires user attention on a couple of important options.
+These are the details of the array job script [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh) which executes the mapping pipeline. This script can run the pipeline in its entirety (from Fastq to final file), or partially. As such, it requires user attention on a couple of important options.
 
 ### User input for the script
 The script takes 4 inputs:
@@ -98,9 +98,8 @@ runDocker.sh \
 <arg $4: metadata>
 ```
 ### Options of the script
-Our code has 2 parts. The first part "Get Sample information" leverages the array job task id "SLURM_ARRAY_TASK_ID" to iterate over the metadata file and extract all important information about the files. Accordingly, the script removes the header of the meatadata file and saves the population name "pop", SRX id "srx", and the number of flies pooled "numFlies". The script assumes that this information corresponds to the columns 1, 14, and 12, respectively in the metadata file (here stored in the $4 variable; i.e., argument 4) --> [make sure the file looks like this](https://github.com/DEST-bio/DEST_freeze1/blob/main/populationInfo/samps.csv)</br>.
+Our code has 2 parts. The first part "Get Sample information" leverages the array job task id "SLURM_ARRAY_TASK_ID" to iterate over the metadata file and extract all important information about the files. Accordingly, the script removes the header of the meatadata file and saves the population name "pop", SRX id "srx", and the number of flies pooled "numFlies". The script assumes that this information corresponds to the columns 1, 14, and 12, respectively in the metadata file (here stored in the $4 variable; i.e., argument 4) --> [make sure the file looks like this](https://github.com/DEST-bio/DEST_freeze1/blob/main/populationInfo/samps_10Nov2020.csv)</br>.
 
-**If the data runs locally:** It is important to note that the script can be modified to run on local data by modifying the "srx=<...>" portion of the code below to ensure the code is capturing the name of the reads. One option is to modify column 14 of metadata file to reflect the correct name of the reads file.
 
 ```bash
 # This is an example. Do not Run
@@ -157,7 +156,7 @@ The paramters for the docker pipeline are:
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
-  --do-snape
+  --do_snape
 
 ```
 
@@ -187,7 +186,7 @@ ${wd}/DEST_freeze1/mappingPipeline/scripts/runDocker.sh \ # The script
 ${wd} \ # Argument 1: Where the SIF file is located
 ${wd}/fastq \ # Argument 2: Where the reads are located
 ${wd}/pipeline_output \ # Argument 3: Output folder
-${wd}/DEST_freeze1/populationInfo/samps.csv
+${wd}/DEST_freeze1/populationInfo/samps_10Nov2020.csv
 ```
 
 After this step has been completed, you are ready to move to the second step of the pipeline. "SNP calling, VCF and GDS generation"
