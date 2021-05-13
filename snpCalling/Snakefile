@@ -11,6 +11,7 @@ poolseq_path = Path(config["poolseq_sync_directory"])
 other_path = Path(config["other_sync_directory"])
 
 wd = Path(config["working_directory"])
+sd = Path(config["script_directory"])
 nJobs = config["poolsnp_jobs"]
 
 input_sync_files = [str(poolseq_path / file) for file in os.listdir(poolseq_path)]
@@ -21,8 +22,9 @@ log_dir = wd / "logs"
 if not log_dir.exists():
     log_dir.mkdir()
 
-job_file_path = wd / "poolSNP_jobs.csv"
-if not job_file_path.exists():
+#if not job_file_path.exists():
+if config["jobs_file"] == "NA":
+    job_file_path = wd / "poolSNP_jobs.csv"
     chr_lens = dict()
     with open(config["script_directory"] + "/scatter_gather_annotate/holo_dmel_6.12.fa.fai") as src:
         for line in src.readlines():
@@ -41,6 +43,8 @@ if not job_file_path.exists():
                 start = ix
                 stop = min(chrom_len, ix + step_size - 1)
                 dest.write(f"{chrom},{start},{stop}\n")
+else:
+    job_file_path = config["jobs_file"]
 
 rule all:
     input:
