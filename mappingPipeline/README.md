@@ -158,6 +158,25 @@ The paramters for the docker pipeline are:
   --do-snape
 
 ```
+
+### The YAML header must be modified to your cluster or machine
+Notice that our example scripts all use a YAML header that is unique to our supercomputer. **You will need to modify this for it to run in your machine!!**
+
+```{sh}
+#!/usr/bin/env bash
+#
+#SBATCH -J dockerMap # A single job name for the array
+#SBATCH -c 11
+#SBATCH -N 1 # on one node
+#SBATCH -t 72:00:00 
+#SBATCH --mem 90G
+#SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
+#SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
+#SBATCH -p standard
+#SBATCH --account jcbnunez
+
+```
+
 ## Running the singularity container across list of populations
 Finally, the user can run the pipeline on their data using the following array job:
 ```bash
