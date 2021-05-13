@@ -24,7 +24,7 @@ if not log_dir.exists():
 
 #if not job_file_path.exists():
 if config["jobs_file"] == "NA":
-    job_file_path = wd / "poolSNP_jobs.csv"
+    job_file_path = wd / "jobs.csv"
     chr_lens = dict()
     with open(config["script_directory"] + "/scatter_gather_annotate/holo_dmel_6.12.fa.fai") as src:
         for line in src.readlines():
@@ -34,7 +34,7 @@ if config["jobs_file"] == "NA":
             if len(chr_lens.keys()) == len(CHRS):
                 break
     total_len = sum(chr_lens.values())
-    with open(wd / "poolSNP_jobs.csv", "w") as dest:
+    with open(wd / "jobs.csv", "w") as dest:
         for chrom in CHRS:
             chrom_len = chr_lens[chrom]
             num_jobs = floor( ( chrom_len / total_len ) * nJobs) + 1
@@ -45,6 +45,7 @@ if config["jobs_file"] == "NA":
                 dest.write(f"{chrom},{start},{stop}\n")
 else:
     job_file_path = config["jobs_file"]
+    shell : "cp {job_file_path} {wd}"
 
 rule all:
     input:
@@ -58,7 +59,7 @@ rule all:
 
 rule runSNP_calling:
     input:
-        job_file=f"{config['working_directory']}/poolSNP_jobs.csv",
+        job_file=f"{config['working_directory']}/jobs.csv",
         input_files=input_sync_files
     output:
         expand("{wd}/sub_vcfs/{{jobid}}.{{popset}}.{{method}}.{{maf}}.{{mac}}.{{version}}.vcf.gz", wd=config['working_directory'])
