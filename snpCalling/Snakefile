@@ -45,7 +45,7 @@ if config["jobs_file"] == "NA":
                 dest.write(f"{chrom},{start},{stop}\n")
 else:
     job_file_path = config["jobs_file"]
-    shell : "cp {job_file_path} {wd}"
+    shell : "cp {job_file_path} {wd}/"
 
 rule all:
     input:
