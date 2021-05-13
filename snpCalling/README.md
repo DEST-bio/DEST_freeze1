@@ -35,12 +35,12 @@ The config file `workflow.yaml` holds other pipeline parameters which should be 
 
 First, do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc. From `DEST_freeze1/snpCalling`, run
 ```bash
-snakemake --profile slurm -n
+/home/aob2x/.local/bin/snakemake --profile slurm -n
 ```
 
 Then, if everything looks OK, run:
 ```bash
-snakemake --profile slurm
+/home/aob2x/.local/bin/snakemake --profile slurm
 ```
 
 ### Output files
