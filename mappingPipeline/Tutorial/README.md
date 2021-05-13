@@ -58,7 +58,7 @@ gzip ToyReads_2.fastq
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ``` 
 
-### Step 2. Created a dump folder for slurm output
+### Step 2. Create a folder for the slurm output
 Now  create a dump folder for all outputs. This is most relevant if running dest on a cluster. 
 ```{sh}
 mkdir ${wd}/slurmOutput
