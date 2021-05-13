@@ -39,8 +39,8 @@ case $key in
     do_poolsnp=1
     shift # past argument
     ;;
-    -dp|--dont-prep)
-    do_prep=0
+    -dp|--do_prep)
+    do_prep=1
     shift # past argument
     ;;
     -bq|--base-quality-threshold)
@@ -110,7 +110,7 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    -ds|--do-snape)
+    -ds|--do_snape)
     do_snape=1
     shift # past argument
     ;;

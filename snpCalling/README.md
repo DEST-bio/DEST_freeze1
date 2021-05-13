@@ -1,6 +1,6 @@
-### Running the Pipeline with Snakemake
+## Running the Pipeline with Snakemake
 
-#### Description
+### Description
 This is a short walkthrough to generate annotated VCF files from previously generated masked SYNC files with the scripts at [DEST_freeze1/mappingPipeline](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline).
 
 This pipeline has three basic steps:
@@ -8,14 +8,14 @@ This pipeline has three basic steps:
   2. Combine sub-sections of the VCF (`DEST_freeze1/snpCalling/scatter_gather_annotate/gather.sh`)
   3. Annotate the VCF and convert to various formats (`DEST_freeze1/snpCalling/scatter_gather_annotate/annotate.sh`)
 
-#### Dependencies
+### Dependencies
  * SLURM based cluster
  * Snakemake (tested with version 6.1.1, pip installable)
  * snpEff (tested with version 4.3t)
  * Modules (loaded on the cluster)
    * htslib, bcftools, parallel, intel/18.0, intelmpi/18.0, mvapich2/2.3.1, R/3.6.3, python/3.6.6, vcftools/0.1.1, gcc/7.1.0 , openmpi/3.1.4
 
-#### Setup
+### Setup
 The config file `slurm/config.yaml` defines the cluster specific snakemake profile. It tells snakemake how to interact with SLURM to schedule jobs and correctly allocate resources. The `cluster` field defines the default command to submit a job and should be changed to fit your available allocations/partitions and any other resource limits or preferences.
 
 The config file `workflow.yaml` holds other pipeline parameters which should be changed to fit your needs:
@@ -31,7 +31,7 @@ The config file `workflow.yaml` holds other pipeline parameters which should be 
  * `poolsnp_jobs`: umber of jobs to break the `run_poolsnp.sh` step into
  * `snpEff_path`: Where to find the .jar for snpEff
 
-#### Running
+### Running
 
 First, do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc. From `DEST_freeze1/snpCalling`, run
 ```bash
@@ -43,5 +43,5 @@ Then, if everything looks OK, run:
 snakemake --profile slurm
 ```
 
-#### Output files
+### Output files
 VCF, BCF, and GDS files are output to `<working_directory>/dest.<popSet>.<method>.<maf>.<mac>.<version>.ann.*`.

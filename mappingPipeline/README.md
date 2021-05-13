@@ -111,13 +111,29 @@ Our code has 2 parts. The first part "Get Sample information" leverages the arra
   numFlies=$( cat $4  | sed '1d' | cut -f1,12 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
 
 ```
-The second part of the script executes the Docker image.  This script uses the reads in the format  "${srx}_1.fastq.gz". Here is an example of three of the core options:
+The second part of the script executes the Docker image.  This script uses the reads in the format  "${srx}_1.fastq.gz".
 
-* **do_poolsnp:** When this option is declared the pipeline runs the poolsnp program on the data.
-* **do-snape:** When this option is declared the pipeline runs the SNAPE-pooled program on the data. Notice that to run this option, you must also run the pool_SNP option first ("do_poolsnp" must be declared before the do-snape option).
-* **dont-prep:** This option is off by default. However, when this option is declared, the pipeline only runs partially and does not map reads. Instead, the program starts from the bam file stage.
+The paramters for the docker pipeline are:
 
-Please see all the options available [here](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/fq_to_sync_pipeline.sh).</br>
+* **read1** Read name and path to PE1 fastq
+* **read2** Read name and path to PE2 fastq
+* **sample** Output sample name
+* **output="."** Keep as is
+* **threads** Number of threads for mapping. Needs to be consistent with SLURM request
+* **max_cov=0.95** Upper threshold (quantile) for read depth filter
+* **min_cov=10** Lower threshold (absolute number) for read depth filter
+* **theta=0.005** Genetic diversity prior for SNAPE-pooled
+* **D=0.01** Genetic differentiation prior between reference genome and population for SNAPE-pooled
+* **priortype="informative"** Flag passed to SNAPE-pooled
+* **fold="unfolded"** Flag passed to SNAPE-pooled
+* **maxsnape=0.9** The posterior probability threshold for classifying site as polymorphic
+* **nflies=40** Number of flies in sample
+* **base_quality_threshold=25** Base quality filtering threshold
+* **illumina_quality_coding=1.8** Illumin encoding
+* **minIndel=5** Filtering distance to indels
+* **do_prep** Runs steps to map raw reads and produces output BAM files. 1=run prep stage; 0=skip prep stage
+* **do_poolsnp** Runs PoolSNP on BAM files. 1=run PoolSNP; 0=skip PoolSNP
+* **do_snape** Runs SNAPE-pooled on BAM files. PoolSNP must be run before running snape. 1=run SNAPE-pooled; 0=skip SNAPE-pooled
 
 ```bash
 # This is an example. Do not Run
