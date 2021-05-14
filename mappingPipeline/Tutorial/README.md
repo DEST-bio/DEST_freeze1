@@ -66,10 +66,10 @@ mkdir ${wd}/slurmOutput
 
 ### Step 4. Create the singularity image
 Now lets build the docker image. **Skip this step if you have already built the image!**
-In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**
+In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**.
 Make sure you are loading singularity in your environment before proceeding.
 ```{sh}
-module load singularity
+module load singularity #<- Remeber that loading singularity in your cluster may be different!
 singularity pull docker://destbiodocker/destbiodocker
 ```
 ### Step 5. Personalize your pipeline options
