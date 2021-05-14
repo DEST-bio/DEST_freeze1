@@ -92,8 +92,10 @@ Depending on your cluster you may have to add additional options such as:
 ```{sh}
 #SBATCH -p <your partition, if applicable>
 #SBATCH --account <your account name, if applicable>
+```
 
 Remember to update your options in the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). **If you are running this code for tutorial purposes, then the default options (shown below) is what you want!**
+
 ```{sh}
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 # The default options
