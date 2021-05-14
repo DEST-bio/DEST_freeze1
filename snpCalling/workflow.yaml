@@ -9,4 +9,4 @@ mac: 50 #Minmum allele count (only used with PoolSNP method)
 version: test
 poolsnp_jobs: 999 #Number of jobs to break the run_poolsnp.sh step into
 snpEff_path: ~/snpEff #Where to find the .jar for snpEff and the config file to use
-jobs_file: NA #/scratch/aob2x/DEST_freeze1/snpCalling/test/jobs.csv #path to filename, if NA it will run the full genome automatically
+jobs_file: /scratch/aob2x/DEST_freeze1/snpCalling/test/jobs.csv #path to filename, if NA it will run the full genome automatically
