@@ -3,7 +3,7 @@
 #SBATCH -J dockerMap # A single job name for the array
 #SBATCH -c 11
 #SBATCH -N 1 # on one node
-#SBATCH -t 72:00:00 
+#SBATCH -t 72:00:00
 #SBATCH --mem 90G
 #SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
 #SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
@@ -21,8 +21,8 @@
   pop=$( cat $4  | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f1 -d',' )
   srx=$( cat $4 | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
   numFlies=$( cat $4  | sed '1d' | cut -f1,12 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
-  
-  
+
+
   echo $pop
   echo $srx
   echo $numFlies

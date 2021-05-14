@@ -244,7 +244,7 @@
 		### This is a function to identify the closest station with the most information
 
 		### first, pull the list of statsions
-			stations <- ghcnd_stations(refresh=TRUE)
+			stations <- ghcnd_stations(refresh=F)
 			stations <- as.data.table(stations)
 
 		### function to identify best station to use
@@ -305,6 +305,7 @@
 		setnames(inv, "Sample", "sampleId")
 		samps <- merge(samps, inv, by="sampleId", all.x=T)
 		dim(samps)
+		inv[grepl("UA_P", sampleId)]
 
 	### load sample filter
 		filter <- fread("./DEST_freeze1/populationInfo/sampleFilter/classify_pops.txt")
@@ -312,7 +313,7 @@
 		samps <- merge(samps, filter[,c("sampleId", "status"),with=F], by="sampleId", all.x=T)
 		samps[is.na(status), status:="Keep"]
 		dim(samps)
-
+		samps[grepl("UA_P", sampleId)]
 
 	### combine samps & worldclim
 		### this:
@@ -334,14 +335,16 @@
 
 		# or this:
 				worldclim <- fread("./DEST_freeze1/populationInfo/worldClim/dest.worldclim.csv")
-				
+
 		# merge
 			samps <- merge(samps, worldclim, by="sampleId", all.x=T)
+			samps[grepl("UA_P", sampleId)]
 
 ### add in simulans contamination rate
 	sim <- fread("./DEST_freeze1/populationInfo/sequencingStats/simulans.csv")
 	samps <- merge(samps, sim[auto==T], by="sampleId", all.x=T)
 	samps <- samps[,-"auto", with=F]
+	samps[grepl("UA_P", sampleId)]
 
 ### add in sex of flies (all pool-seq are male, all dgn are female)
 	samps[,sex:="male"]
