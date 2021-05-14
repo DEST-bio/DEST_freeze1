@@ -68,10 +68,14 @@ mkdir ${wd}/slurmOutput
 Now lets build the docker image. **Skip this step if you have already built the image!**
 In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**.
 Make sure you are loading singularity in your environment before proceeding.
+
+*If this is your first time doing this, this step may take a while. But you only have to do this once.*
+
 ```{sh}
 module load singularity # <- Remember you may have to load "singularity" differently in your cluster.
 singularity pull docker://destbio/destbiodocker
 ```
+
 ### Step 5. Personalize your pipeline options
 Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). The default header (shown below) is provided as an example, and will not work on your cluster. 
 If you are unfamiliar with the SLURM header. Read more [here](https://slurm.schedmd.com/documentation.html). 
