@@ -13,7 +13,7 @@
 
 wd=/scratch/aob2x/dest
 
-chmod +x ${wd}/DEST/mappingPipeline/scripts/guess_encoding.py
+chmod +x ${wd}/DEST_freeze1/mappingPipeline/scripts/guess_encoding.py
 
 if test -f ${wd}/fastq/qualEncodings.delim; then
     rm ${wd}/fastq/qualEncodings.delim
