@@ -29,7 +29,7 @@ Test_toy_Files ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyReads_1.fastq.gz
 Test_toy_Files ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyReads_2.fastq.gz
 Test_toy_Files ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyExample_samps.csv
 ```
-**If everything looks good proceed to step 2**. Keep on reading if you would like to learn more about the toy dataset.
+**If everything looks good proceed to step 3**. Keep on reading if you would like to learn more about the toy dataset.
 
 #### Extra notes on the toy dataset:
 These toy reads were generated using  [bbmap](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/). In our case, we generated a toy dataset of 20k reads (10k paired end reads to be exact) by sampling a real FASTQ file.
@@ -66,6 +66,8 @@ mkdir ${wd}/slurmOutput
 
 ### Step 4. Create the singularity image
 Now lets build the docker image. **Skip this step if you have already built the image!**
+In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**
+Make sure you are loading singularity in your environment before proceeding.
 ```{sh}
 module load singularity
 singularity pull docker://destbiodocker/destbiodocker
@@ -84,10 +86,13 @@ If you are unfamiliar with the SLURM header. Read more [here](https://slurm.sche
 #SBATCH --mem 90G #<= this may depend on your resources
 #SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
 #SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
-#SBATCH -p <your partition, if applicable>
-#SBATCH --account <your account name, if applicable>
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```
+Depending on your cluster you may have to add additional options such as:
+```{sh}
+#SBATCH -p <your partition, if applicable>
+#SBATCH --account <your account name, if applicable>
+
 Remember to update your options in the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). **If you are running this code for tutorial purposes, then the default options (shown below) is what you want!**
 ```{sh}
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####

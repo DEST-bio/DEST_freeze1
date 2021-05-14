@@ -173,9 +173,11 @@ Notice that our example scripts all use an example SLURM header that is unique t
 #SBATCH --mem 90G #<= this may depend on your resources
 #SBATCH -o ./slurmOutput/RunDest.%A_%a.out # Standard output
 #SBATCH -e ./slurmOutput/RunDest.%A_%a.err # Standard error
+```
+Depending on your cluster you may have to add additional options such as:
+```{sh}
 #SBATCH -p <your partition, if applicable>
 #SBATCH --account <your account name, if applicable>
-
 ```
 
 ## Running the singularity container across list of populations
