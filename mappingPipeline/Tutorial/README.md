@@ -102,7 +102,7 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
 ###################################
 # Part  2. Run Docker             #
 ###################################
-  module load singularity
+  module load singularity #<- Remeber that loading singularity in your cluster may be different!
 
   singularity run \
   $1/destbiodocker_latest.sif \
