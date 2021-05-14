@@ -66,10 +66,10 @@ mkdir ${wd}/slurmOutput
 
 ### Step 4. Create the singularity image
 Now lets build the docker image. **Skip this step if you have already built the image!**
-In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**
+In this example we are loading the program "singularity" using the option "module load". **This may vary in your cluster**.
 Make sure you are loading singularity in your environment before proceeding.
 ```{sh}
-module load singularity
+module load singularity #<- Remeber that loading singularity in your cluster may be different!
 singularity pull docker://destbiodocker/destbiodocker
 ```
 ### Step 5. Personalize your pipeline options
@@ -92,15 +92,17 @@ Depending on your cluster you may have to add additional options such as:
 ```{sh}
 #SBATCH -p <your partition, if applicable>
 #SBATCH --account <your account name, if applicable>
+```
 
 Remember to update your options in the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). **If you are running this code for tutorial purposes, then the default options (shown below) is what you want!**
+
 ```{sh}
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 # The default options
 ###################################
 # Part  2. Run Docker             #
 ###################################
-  module load singularity
+  module load singularity #<- Remeber that loading singularity in your cluster may be different!
 
   singularity run \
   $1/destbiodocker_latest.sif \

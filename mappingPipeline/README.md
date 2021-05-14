@@ -4,7 +4,7 @@
 
 This set of scripts provides a pipeline to build wholeGenomeSync files for each population sample from raw FASTQ data and defines a Dockerfile to build a docker image which can act as a standalone tool to run the pipeline.
 
-Please read this repo to learn about the various options of our pipeline. We recommend running through our [TUTORIAL](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline/Tutorial) before using this script on the entire dataset. The tutorial uses a small toy dataset and only takes ~15-20 minutes to run.
+Please read this repo to learn about the various options of our pipeline. We recommend running through our [TUTORIAL](https://github.com/DEST-bio/DEST_freeze1/tree/main/mappingPipeline/Tutorial) before using this script on the entire dataset. The tutorial uses a small toy dataset and only takes ~15-20 minutes to run (it may take a little longer if you have to build the docker image for the first time).
 
 This repo is divided into various sections and users may start it at different point depending on their starting data. For example, users seeking to replicate our results from the DEST paper are advised to execute all steps. On the other hand, those using the data set on new data may start the pipeline at a different point depending if the data is to be downloaded from the SRA archive or if it exist locally in the user's cluster.
 
@@ -136,13 +136,15 @@ The paramters for the docker pipeline are:
 * **do_poolsnp** Runs PoolSNP on BAM files. 1=run PoolSNP; 0=skip PoolSNP
 * **do_snape** Runs SNAPE-pooled on BAM files. PoolSNP must be run before running snape. 1=run SNAPE-pooled; 0=skip SNAPE-pooled
 
+In this example we are loading the program "singularity" using the option "module load". This may vary in your cluster. Make sure you are loading singularity in your environment before proceeding.
+
 ```bash
 # This is an example. Do not Run
 ###################################
 # Part  2. Run Docker             #
 ###################################
 
-  module load singularity
+  module load singularity #<- Remeber that loading singularity in your cluster may be different!
 
   singularity run \
   $1/destbiodocker_latest.sif \
