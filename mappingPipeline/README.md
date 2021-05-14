@@ -136,13 +136,15 @@ The paramters for the docker pipeline are:
 * **do_poolsnp** Runs PoolSNP on BAM files. 1=run PoolSNP; 0=skip PoolSNP
 * **do_snape** Runs SNAPE-pooled on BAM files. PoolSNP must be run before running snape. 1=run SNAPE-pooled; 0=skip SNAPE-pooled
 
+In this example we are loading the program "singularity" using the option "module load". This may vary in your cluster. Make sure you are loading singularity in your environment before proceeding.
+
 ```bash
 # This is an example. Do not Run
 ###################################
 # Part  2. Run Docker             #
 ###################################
 
-  module load singularity
+  module load singularity #<- Remeber that loading singularity in your cluster may be different!
 
   singularity run \
   $1/destbiodocker_latest.sif \
