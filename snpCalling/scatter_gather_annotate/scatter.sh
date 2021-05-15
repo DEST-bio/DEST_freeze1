@@ -23,8 +23,8 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
 
 ## get list of SNYC files based on popSet & method
 ### full list
-  syncPath1orig="${9}/*masked.sync.gz"
-  syncPath2orig="${10}/*masked.sync.gz"
+  syncPath1orig="${9}/*/*masked.sync.gz"
+  syncPath2orig="${10}/*/*masked.sync.gz"
 
 ### target pops
   if [[ "${popSet}" == "PoolSeq" ]]; then
@@ -34,6 +34,8 @@ module load htslib bcftools parallel intel/18.0 intelmpi/18.0 mvapich2/2.3.1 R/3
     syncPath1=${syncPath1orig}
     syncPath2=${syncPath2orig}
   fi
+
+echo $( ls ${syncPath1} ${syncPath2})
 
 ## get job
 #   job=$( cat ${wd}/${jobs} | sed "${SLURM_ARRAY_TASK_ID}q;d" )

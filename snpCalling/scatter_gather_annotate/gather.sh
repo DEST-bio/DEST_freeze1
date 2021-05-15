@@ -19,7 +19,7 @@ if [ ! -d $bcf_outdir ]; then
     mkdir $bcf_outdir
 fi
 
-outdir=sub_vcfs
+outdir=$wd/sub_vcfs
 cd ${wd}
 
 ls -d ${outdir}/*.${popSet}.${method}.${maf}.${mac}.${version}.vcf.gz | sort -t"_" -k2,2 -k4g,4  | \
