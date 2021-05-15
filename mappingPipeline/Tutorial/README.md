@@ -73,7 +73,7 @@ Make sure you are loading singularity in your environment before proceeding.
 
 ```{sh}
 module load singularity # <- Remember you may have to load "singularity" differently in your cluster.
-singularity pull docker://destbio/dest_freeze1
+singularity pull docker://destbio/dest_freeze1_v1:latest
 ```
 
 ### Step 5. Personalize your pipeline options
