@@ -163,10 +163,10 @@ ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyExample_samps.csv
 ```
 If the toy example looks fine (i.e., no errors were produced in the pipeline), then you are ready to run the pipeline on the whole dataset!
 
-A succesful run should produce, among other things:
+A succesful run should produce various files, for example:
 
 * FastQC reports for the reads
 * BAM and MPILEUP file for the population being processed
 * Reports on read mapping (e.g., duplicates)
-* A sync file (this will be a large file ending in .sync.gz)
-* Various sync files for SNAPE (e.g., masked sies, monomorphic sites, etc.)
+* A sync.gz file and a bed.gz file.
+* Various sync files specifically for SNAPE (e.g., masked sies, monomorphic sites, etc.)
