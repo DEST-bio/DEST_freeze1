@@ -120,7 +120,7 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
-  --do-snape
+  --do_snape
   
   #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```

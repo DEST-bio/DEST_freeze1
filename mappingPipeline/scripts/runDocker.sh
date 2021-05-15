@@ -46,4 +46,4 @@
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
-  --do-snape
+  --do_snape
