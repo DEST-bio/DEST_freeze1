@@ -168,5 +168,5 @@ A succesful run should produce various files, for example:
 * FastQC reports for the reads
 * BAM and MPILEUP file for the population being processed
 * Reports on read mapping (e.g., duplicates)
-* A sync.gz file and a bed.gz file.
-* Various sync files specifically for SNAPE (e.g., masked sies, monomorphic sites, etc.)
+* A sync.gz files (including masked sites) and a bed.gz file.
+* Various sync files specifically for SNAPE (e.g., masked sites, monomorphic sites, etc.)
