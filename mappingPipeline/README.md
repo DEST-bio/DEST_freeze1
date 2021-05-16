@@ -147,7 +147,7 @@ In this example we are loading the program "singularity" using the option "modul
   module load singularity #<- Remember that loading singularity in your cluster may be different!
 
   singularity run \
-  $1/dest_freeze1_v1_latest.sif \
+  $1/dest_freeze1_latest.sif \
   $2/${srx}_1.fastq.gz \
   $2/${srx}_2.fastq.gz \
   ${pop} \

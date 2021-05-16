@@ -35,7 +35,7 @@
 ###################################
 
   singularity run \
-  $1/destbiodocker_latest.sif \
+  $1/dest_freeze1_latest.sif \
   $2/${srx}_1.fastq.gz \
   $2/${srx}_2.fastq.gz \
   ${pop} \
@@ -46,4 +46,4 @@
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
-  --do-snape
+  --do_snape
