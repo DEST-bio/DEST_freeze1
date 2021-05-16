@@ -77,7 +77,7 @@ module load singularity # <- Remember you may have to load "singularity" differe
 singularity pull docker://destbio/dest_freeze1:latest
 
 =======
-singularity pull docker://destbio/dest_freeze1_v1:latest
+singularity pull docker://destbio/dest_freeze1:latest
 >>>>>>> 2a7e04846d756706b5ae35ee45b8e1993c03220c
 ```
 
