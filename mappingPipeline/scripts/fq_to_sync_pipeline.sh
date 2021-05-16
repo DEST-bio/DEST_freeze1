@@ -341,7 +341,7 @@ if [ $do_snape -eq "1" ]; then
   --coverage $output/$sample/${sample}.cov \
   --mincov $min_cov \
   --maxcov $max_cov \
-  --te /opt/DEST_freeze1/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
+  --te /opt/DEST_freeze1/mappingPipeline/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
   --maxsnape $maxsnape \
   --SNAPE
 
@@ -356,7 +356,7 @@ if [ $do_snape -eq "1" ]; then
   --coverage $output/$sample/${sample}.cov \
   --mincov $min_cov \
   --maxcov $max_cov \
-  --te /opt/DEST_freeze1/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
+  --te /opt/DEST_freeze1/mappingPipeline/RepeatMasker/ref/dmel-all-chromosome-r6.12.fasta.out.gff \
   --maxsnape $maxsnape \
   --SNAPE
 

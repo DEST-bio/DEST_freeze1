@@ -73,8 +73,12 @@ Make sure you are loading singularity in your environment before proceeding.
 
 ```{sh}
 module load singularity # <- Remember you may have to load "singularity" differently in your cluster.
+<<<<<<< HEAD
 singularity pull docker://destbio/dest_freeze1:latest
 
+=======
+singularity pull docker://destbio/dest_freeze1_v1:latest
+>>>>>>> 2a7e04846d756706b5ae35ee45b8e1993c03220c
 ```
 
 ### Step 5. Personalize your pipeline options
@@ -110,7 +114,7 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
   module load singularity #<- Remember that loading singularity in your cluster may be different!
 
   singularity run \
-  $1/destbiodocker_latest.sif \
+  $1/dest_freeze1_latest.sif \
   $2/${srx}_1.fastq.gz \
   $2/${srx}_2.fastq.gz \
   ${pop} \
@@ -121,8 +125,13 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
   --base-quality-threshold 25 \
   --num-flies ${numFlies} \
   --do_poolsnp \
+<<<<<<< HEAD
   --do-snape
 
+=======
+  --do_snape
+
+>>>>>>> 2a7e04846d756706b5ae35ee45b8e1993c03220c
   #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```
 
@@ -162,4 +171,16 @@ ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ \
 ${wd}/example_output_freeze1 \
 ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyExample_samps.csv
 ```
+<<<<<<< HEAD
 If the toy example looks fine, then you are ready to run the pipeline on the whole dataset!
+=======
+If the toy example looks fine (i.e., no errors were produced in the pipeline), then you are ready to run the pipeline on the whole dataset!
+
+A succesful run should produce various files, for example:
+
+* FastQC reports for the reads
+* BAM and MPILEUP file for the population being processed
+* Reports on read mapping (e.g., duplicates)
+* A sync.gz files (including masked sites) and a bed.gz file.
+* Various sync files specifically for SNAPE (e.g., masked sites, monomorphic sites, etc.)
+>>>>>>> 2a7e04846d756706b5ae35ee45b8e1993c03220c

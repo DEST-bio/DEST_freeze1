@@ -76,7 +76,7 @@ grep -v "1.8" ${wd}/fastq/qualEncodings.delim
 Download (and create the SIF image of) the docker image of the DEST mapping pipeline. This process may take a few minutes.
 ```bash
 module load singularity # <- Remember you may have to load "singularity" differently in your cluster.
-singularity pull docker://destbio/destbiodocker
+singularity pull docker://destbio/dest_freeze1_v1:latest
 ```
 
 ## Pipeline options
@@ -147,7 +147,7 @@ In this example we are loading the program "singularity" using the option "modul
   module load singularity #<- Remember that loading singularity in your cluster may be different!
 
   singularity run \
-  $1/destbiodocker_latest.sif \
+  $1/dest_freeze1_v1_latest.sif \
   $2/${srx}_1.fastq.gz \
   $2/${srx}_2.fastq.gz \
   ${pop} \

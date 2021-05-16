@@ -16,7 +16,7 @@
 ###################################
 # Part  1. Get Sample information #
 ###################################
-
+  #SLURM_ARRAY_TASK_ID=1
 
   pop=$( cat $4  | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f1 -d',' )
   srx=$( cat $4 | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "${SLURM_ARRAY_TASK_ID}q;d" | cut -f2 -d',' )
