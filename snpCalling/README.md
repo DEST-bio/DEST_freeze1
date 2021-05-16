@@ -10,7 +10,7 @@ This pipeline has three basic steps:
 
 ### Dependencies
  * SLURM based cluster
- * Snakemake (tested with version 6.1.1, pip installable)
+ * Snakemake (tested with version 6.1.1, pip installable `pip install snakemake==6.1.1`)
  * snpEff (tested with version 4.3t)
  * Modules (loaded on the cluster)
    * htslib, bcftools, parallel, intel/18.0, intelmpi/18.0, mvapich2/2.3.1, R/3.6.3, python/3.6.6, vcftools/0.1.1, gcc/7.1.0 , openmpi/3.1.4
@@ -35,12 +35,13 @@ The config file `workflow.yaml` holds other pipeline parameters which should be 
 
 First, do a dry run with snakemake. This outputs the jobs which will be submitted, checks that everything snakemake needs for initialization is present, checks for syntax issues, etc. From `DEST_freeze1/snpCalling`, run
 ```bash
-/home/aob2x/.local/bin/snakemake --profile slurm -n
+module load gcc/9.2.0  openmpi/3.1.6 python/3.7.7
+snakemake --profile slurm -n
 ```
 
 Then, if everything looks OK, run:
 ```bash
-/home/aob2x/.local/bin/snakemake --profile slurm
+snakemake --profile slurm
 ```
 
 ### Output files

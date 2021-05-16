@@ -3,7 +3,7 @@
 The following script will guide the user through a example of the mapping pipeline described in our paper using a toy dataset.
 
 ### Step 1. Define your working directory and  Download the DEST pipeline
-Throughout our example we will use ${wd} as the base directory. 
+Throughout our example we will use ${wd} as the base directory.
 ```{sh}
 wd=.
 git clone https://github.com/DEST-bio/DEST_freeze1.git
@@ -14,7 +14,7 @@ The toy dataset is provided in this github. Make sure you find the reads in the 
 Start by declaring this function:
 
 ```{sh}
-Test_toy_Files () { 
+Test_toy_Files () {
 if [[ -e "$1" ]]
 then
 echo "Good News: The file ${1} exists."
@@ -56,10 +56,10 @@ usejni=t
 gzip ToyReads_1.fastq
 gzip ToyReads_2.fastq
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
-``` 
+```
 
 ### Step 3. Create a folder for the slurm output
-Now  create a dump folder for all outputs. This is most relevant if running dest on a cluster. 
+Now  create a dump folder for all outputs. This is most relevant if running dest on a cluster.
 ```{sh}
 mkdir ${wd}/slurmOutput
 ```
@@ -73,12 +73,13 @@ Make sure you are loading singularity in your environment before proceeding.
 
 ```{sh}
 module load singularity # <- Remember you may have to load "singularity" differently in your cluster.
-singularity pull docker://destbio/destbiodocker
+singularity pull docker://destbio/dest_freeze1:latest
+
 ```
 
 ### Step 5. Personalize your pipeline options
-Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). The default header (shown below) is provided as an example, and will not work on your cluster. 
-If you are unfamiliar with the SLURM header. Read more [here](https://slurm.schedmd.com/documentation.html). 
+Remember to update your SLURM header for the file [runDocker.sh](https://github.com/DEST-bio/DEST_freeze1/blob/main/mappingPipeline/scripts/runDocker.sh). The default header (shown below) is provided as an example, and will not work on your cluster.
+If you are unfamiliar with the SLURM header. Read more [here](https://slurm.schedmd.com/documentation.html).
 ```{sh}
 #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 #!/usr/bin/env bash
@@ -121,7 +122,7 @@ Remember to update your options in the file [runDocker.sh](https://github.com/DE
   --num-flies ${numFlies} \
   --do_poolsnp \
   --do-snape
-  
+
   #### NOT PART OF THE TUTORIAL DO NOT RUN #####
 ```
 
@@ -133,7 +134,7 @@ This step will run the tutorial pipeline. Notice that we are using tutorial-spec
 
 The mapping pipeline works by extracting information from the metadata file. for example, declare this function.
 ```{sh}
-What_will_i_run () { 
+What_will_i_run () {
 
 pop=$( cat $1  | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "1q;d" | cut -f1 -d',' )
 srx=$( cat $1 | sed '1d' | cut -f1,14 -d',' | grep -v "NA" | sed "1q;d" | cut -f2 -d',' )
@@ -158,7 +159,7 @@ sbatch --array=1-$( sed '1d' ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyExam
 ${wd}/DEST_freeze1/mappingPipeline/scripts/runDocker.sh \
 ${wd} \
 ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ \
-${wd}/example_output \
+${wd}/example_output_freeze1 \
 ${wd}/DEST_freeze1/mappingPipeline/Tutorial/ToyExample_samps.csv
 ```
 If the toy example looks fine, then you are ready to run the pipeline on the whole dataset!
