@@ -216,8 +216,8 @@ RUN bwa index /opt/hologenome/holo_dmel_6.12.fa && \
 ARG CACHE_BUST=06:03:2020:1800
 
 RUN python3 /opt/DEST_freeze1/mappingPipeline/scripts/PickleRef.py \
-    --ref /opt/hologenome/holo_dmel_6.12.fa \
-    --output /opt/hologenome/holo_dmel_6.12.fa.pickled > pickled_ref.out
+    --ref /opt/hologenome/raw/D_melanogaster_r6.12.fasta  \
+    --output /opt/hologenome/raw/D_melanogaster_r6.12.fasta.pickled > pickled_ref.out
 
 WORKDIR /opt
 RUN rm -rf /opt/DEST_freeze1/ && \
