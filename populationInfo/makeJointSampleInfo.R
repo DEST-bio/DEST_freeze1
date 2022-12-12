@@ -59,7 +59,7 @@
 		dat.drosEU.dt[,type:="pooled"]
 		#dat.drosEU.dt[,collectionDate := as.POSIXct(collectionDate)]
 		dat.drosEU.dt[,continent:="Europe"]
-		dat.drosEU.dt[,country:="Guadeloupe", continent:="North America"]
+		dat.drosEU.dt[country=="Guadeloupe", continent:="North America"]
 
 		dat.drosEU.dt[,set:="DrosEU"]
 		dat.drosEU.dt[,nFlies:=as.numeric(as.character(nAutosomes))/2]
@@ -70,6 +70,7 @@
 		dat.drosEU.dt[,collector:=gsub(" ", "_", collector)]
 		dat.drosEU.dt[sampleType=="Yes", sampleType:="wild"]
 		dat.drosEU.dt[sampleType!="wild", sampleType:="wild_caught_and_F1"]
+		dat.drosEU.dt[,DateExact:=TRUE]
 
 		#### change the spelling of 5 Ukranian samples to correct for differences in spelling
 		#	dat.drosEU.dt[grepl("UA_Cho_14", sampleId), sampleId:=gsub("UA_Cho_14", "UA_Che_14", sampleId)]
@@ -88,12 +89,14 @@
 
 
 	### load in DrosRTEC data
-		dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
+		### https://cdn.elifesciences.org/articles/67577/elife-67577-supp1-v2.xlsx
+			dat.drosRTEC <- read.xls("./DEST_freeze1/populationInfo/OriginalMetadata/vcf_popinfo_Oct2018.xlsx")
+			dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 14,11, 12, 7, 17, 3, 20, 29)])
+			setnames(dat.drosRTEC.dt,
+					names(dat.drosRTEC.dt),
+					c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "DateExact", "lat", "long", "season", "nFlies", "locality", "collector", "sampleType"))
 
-		dat.drosRTEC.dt <- as.data.table(dat.drosRTEC[,c(1, 4, 10, 8, 13, 11, 12, 7, 17, 3, 20,29)])
-		setnames(dat.drosRTEC.dt,
-				names(dat.drosRTEC.dt),
-				c("sampleName", "sra_sampleName", "country", "city", "collectionDate", "lat", "long", "season", "nFlies", "locality", "collector", "sampleType"))
+
 		dat.drosRTEC.dt[,type:="pooled"]
 		#dat.drosRTEC.dt[,collectionDate := as.POSIXct(collectionDate)]
 		dat.drosRTEC.dt[long>0,continent:="Europe"]
@@ -104,6 +107,9 @@
 		dat.drosRTEC.dt[,collectionDate:=gsub("-", "/", collectionDate)]
 		dat.drosRTEC.dt[,collector:=gsub(",", ";", collector)]
 		dat.drosRTEC.dt[,collector:=gsub(" ", "_", collector)]
+		dat.drosRTEC.dt[,DateExact:=as.numeric(as.character(tstrsplit(DateExact, "-")[[1]]))]
+		dat.drosRTEC.dt[,DateExact:=!is.na(DateExact)]
+
 
 		### fix issue with SRA_accession numbers for a few Maine populations
 			#dat.drosRTEC.dt[sampleId=="ME_bo_09_fall.r1", SRA_accession:="SRX661844"]
@@ -210,13 +216,14 @@
 			dat.dpgp.dt[,SRA_accession:=NA]
 			dat.dpgp.dt[,SRA_experiment:=NA]
 			dat.dpgp.dt[,Model:=NA]
+			dat.dpgp.dt[,DateExact:=NA]
 
 			setnames(dat.dpgp.dt, "n", "nFlies")
 			setnames(dat.dpgp.dt, "Genome.Type", "type")
 
 	### combine,
 		columns2use <- c("sampleId", "country", "city",
-											"collectionDate", "lat", "long", "season", "locality",
+											"collectionDate", "DateExact", "lat", "long", "season", "locality",
 											"type", "continent", "set", "nFlies",
 											"SRA_accession", "SRA_experiment",
 											"Model", "collector", "sampleType")
